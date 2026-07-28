@@ -30,6 +30,9 @@ data/processed/
 *.pkl
 *.joblib
 
+# Materiais educacionais mantidos somente no ambiente local
+docs/aprendizado/
+
 # Editores e sistema operacional
 .idea/
 .vscode/
