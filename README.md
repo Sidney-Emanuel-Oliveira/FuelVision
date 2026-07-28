@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 5 — Análises e Consultas SQL** adicionou indicadores descritivos por produto, estado, município e data. As consultas calculam quantidade, média, mínimo, máximo e amplitude, aceitam filtros e validam os resultados contra as observações armazenadas. Ainda não existe API, interface ou modelo de Machine Learning.
+O **Módulo 6 — API Back-end com Java e Spring Boot** disponibilizou cinco endpoints REST somente para leitura. A API consulta observações, resumos, histórico e localidades no PostgreSQL, valida filtros, pagina resultados, padroniza erros e publica documentação OpenAPI/Swagger. Ainda não existe interface ou modelo de Machine Learning.
 
 ## Propósito
 
@@ -32,15 +32,18 @@ Consulte:
 - [`docs/database/MODELO_RELACIONAL.md`](docs/database/MODELO_RELACIONAL.md): tabelas, chaves e relacionamentos;
 - [`docs/database/POSTGRESQL_LOCAL.md`](docs/database/POSTGRESQL_LOCAL.md): configuração, carga e testes do banco local;
 - [`docs/database/ANALISES_SQL.md`](docs/database/ANALISES_SQL.md): indicadores, filtros, resultados e limitações analíticas.
+- [`docs/backend/API_BACKEND.md`](docs/backend/API_BACKEND.md): arquitetura, endpoints, execução, testes e limites da API.
 
 ## Pré-requisitos atuais
 
-Para executar o projeto até o Módulo 4, é necessário ter:
+Para executar o projeto até o Módulo 6, é necessário ter:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
 - Python 3.9 ou compatível;
 - PostgreSQL 17 com `psql`, `createdb` e `createuser`;
+- Java 21 ou mais recente;
+- Maven 3.6.3 ou mais recente;
 - um terminal para executar os comandos documentados.
 
 O código Python continua utilizando somente a biblioteca padrão. Não foi adicionado driver Python de PostgreSQL porque a carga deste módulo utiliza o cliente oficial `psql`.
@@ -62,6 +65,9 @@ database/scripts/validate_analytics.sh
 database/scripts/run_analytics.sh
 python3 -m unittest discover -s tests -v
 FUELVISION_RUN_DB_TESTS=1 python3 -m unittest discover -s tests -v
+backend/scripts/test.sh
+backend/scripts/test.sh --with-postgres
+backend/scripts/run.sh
 ```
 
 Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. O último comando ativa os testes que exigem PostgreSQL em execução.
@@ -73,7 +79,8 @@ Leia os documentos técnicos nesta ordem:
 3. `docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`;
 4. `docs/database/MODELO_RELACIONAL.md`;
 5. `docs/database/POSTGRESQL_LOCAL.md`;
-6. `docs/database/ANALISES_SQL.md`.
+6. `docs/database/ANALISES_SQL.md`;
+7. `docs/backend/API_BACKEND.md`.
 
 ## Limitações atuais
 
@@ -84,7 +91,8 @@ Leia os documentos técnicos nesta ordem:
 - a evolução diária não acompanha o mesmo conjunto de revendas em todas as datas;
 - o modelo guarda o estado atual da revenda, não seu histórico de alterações;
 - ainda não há ferramenta de migração ou histórico de lotes carregados;
-- nenhuma API ou interface foi criada;
+- a API é somente leitura e ainda não possui autenticação, CORS, cache ou limite por cliente;
+- nenhuma interface foi criada;
 - nenhum modelo de Machine Learning foi desenvolvido;
 - não existem conclusões estatísticas ou métricas de negócio.
 
