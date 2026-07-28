@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 7 — Dashboard React e TypeScript** disponibilizou uma interface responsiva conectada à API real. O painel apresenta indicadores, evolução histórica, comparação entre estados e filtros, com tratamento de carregamento, erro e resposta vazia. Ainda não existe modelo de Machine Learning.
+O **Módulo 8 — Machine Learning: Baseline** adicionou o primeiro experimento de regressão com separação temporal, baseline por média de produto, regressão Ridge e métricas MAE e RMSE. O experimento demonstrou que o Ridge ainda não supera a referência simples nesta amostra e, por isso, não é apresentado como um modelo pronto para uso.
 
 ## Propósito
 
@@ -34,10 +34,11 @@ Consulte:
 - [`docs/database/ANALISES_SQL.md`](docs/database/ANALISES_SQL.md): indicadores, filtros, resultados e limitações analíticas.
 - [`docs/backend/API_BACKEND.md`](docs/backend/API_BACKEND.md): arquitetura, endpoints, execução, testes e limites da API.
 - [`docs/frontend/DASHBOARD.md`](docs/frontend/DASHBOARD.md): componentes, integração, filtros, gráficos, execução e testes do dashboard.
+- [`docs/ml/BASELINE_MODEL.md`](docs/ml/BASELINE_MODEL.md): problema preditivo, preparação temporal, baseline, Ridge, métricas e limitações.
 
 ## Pré-requisitos atuais
 
-Para executar o projeto até o Módulo 7, é necessário ter:
+Para executar o projeto até o Módulo 8, é necessário ter:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
@@ -48,7 +49,7 @@ Para executar o projeto até o Módulo 7, é necessário ter:
 - Node.js compatível com Vite 8 e npm;
 - um terminal para executar os comandos documentados.
 
-O código Python continua utilizando somente a biblioteca padrão. Não foi adicionado driver Python de PostgreSQL porque a carga deste módulo utiliza o cliente oficial `psql`.
+O experimento de Machine Learning requer um ambiente virtual com pandas 2.3.3 e scikit-learn 1.6.1. As versões estão fixadas em `ml/requirements.txt`. Não foi adicionado driver Python de PostgreSQL porque a carga continua utilizando o cliente oficial `psql`.
 
 ## Como executar
 
@@ -65,8 +66,13 @@ database/scripts/run_initial_queries.sh
 database/scripts/create_analytics_views.sh
 database/scripts/validate_analytics.sh
 database/scripts/run_analytics.sh
-python3 -m unittest discover -s tests -v
-FUELVISION_RUN_DB_TESTS=1 python3 -m unittest discover -s tests -v
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r ml/requirements-dev.txt
+.venv/bin/python -m unittest discover -s tests -v
+FUELVISION_RUN_DB_TESTS=1 .venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m ml.train_evaluate \
+  --input data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
 backend/scripts/test.sh
 backend/scripts/test.sh --with-postgres
 backend/scripts/run.sh
@@ -92,6 +98,7 @@ Leia os documentos técnicos nesta ordem:
 6. `docs/database/ANALISES_SQL.md`;
 7. `docs/backend/API_BACKEND.md`.
 8. `docs/frontend/DASHBOARD.md`.
+9. `docs/ml/BASELINE_MODEL.md`.
 
 ## Limitações atuais
 
@@ -106,7 +113,10 @@ Leia os documentos técnicos nesta ordem:
 - a comparação do dashboard realiza uma consulta de resumo por estado;
 - o histórico exibido pelo dashboard está limitado a 100 pontos por consulta;
 - não houve auditoria completa de acessibilidade com tecnologia assistiva;
-- nenhum modelo de Machine Learning foi desenvolvido;
+- o primeiro Ridge não superou o baseline por média de produto no teste temporal;
+- o experimento usa apenas 50 observações líquidas, com uma data de treino e uma de teste;
+- GNV não participa do baseline porque utiliza `BRL/m3`;
+- o modelo existe somente em memória durante o experimento e não está disponível na API ou no dashboard;
 - não existem conclusões estatísticas ou métricas de negócio.
 
 Essas limitações são intencionais e preservam a progressão definida no plano.

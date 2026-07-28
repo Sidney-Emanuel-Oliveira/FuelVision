@@ -1,0 +1,11 @@
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["UP045"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
