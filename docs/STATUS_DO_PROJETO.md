@@ -14,10 +14,10 @@ Atualizado em: 28/07/2026.
 | 7      | Dashboard React e TypeScript            | Concluído    | 28/07/2026 | React, TypeScript, indicadores, gráficos, filtros, estados e 11 testes           |
 | 8      | Machine Learning: Baseline              | Concluído    | 28/07/2026 | Split temporal, baseline, Ridge, MAE, RMSE, comparação e 13 testes               |
 | 9      | Previsão Disponível pela Aplicação      | Concluído    | 28/07/2026 | Baseline persistido, FastAPI, integração Spring, painel preditivo e 47 testes     |
-| 10     | Detecção de Anomalias                   | Não iniciado | —          | —                                                                                |
+| 10     | Detecção de Anomalias                   | Concluído    | 28/07/2026 | IQR, endpoint paginado, motivos, painel responsável e 49 testes                    |
 | 11     | Qualidade, Docker e Integração Contínua | Não iniciado | —          | —                                                                                |
 | 12     | Documentação Profissional e Deploy      | Não iniciado | —          | —                                                                                |
 
 ## Observação
 
-Os Módulos 0, 1, 2, 3, 4, 5, 6, 7, 8 e 9 estão concluídos. Os demais módulos aguardam autorização.
+Os Módulos 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 e 10 estão concluídos. Os demais módulos aguardam autorização.

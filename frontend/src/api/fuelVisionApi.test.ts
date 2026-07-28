@@ -1,5 +1,6 @@
 import {
   ApiError,
+  getAnomalies,
   getCities,
   getHistory,
   getPredictionModel,
@@ -126,6 +127,19 @@ describe("fuelVisionApi", () => {
           collectionDate: "2026-01-03",
         }),
       }),
+    );
+  });
+
+  it("consulta anomalias com os filtros e a paginação segura", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(jsonResponse({ items: [], totalItems: 0 }));
+
+    await getAnomalies({ product: "ÓLEO DIESEL", state: "AC" });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/prices/anomalies?product=%C3%93LEO+DIESEL&state=AC&page=0&size=20",
+      expect.objectContaining({ headers: { Accept: "application/json" } }),
     );
   });
 });

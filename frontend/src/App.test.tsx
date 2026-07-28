@@ -16,6 +16,11 @@ vi.mock("./components/PredictionPanel", () => ({
     <div>Estimativa para {selectedProduct}</div>
   ),
 }));
+vi.mock("./components/AnomalyPanel", () => ({
+  AnomalyPanel: ({ filters }: { filters: { product: string } }) => (
+    <div>Alertas para {filters.product}</div>
+  ),
+}));
 
 const summary = {
   product: "GNV",

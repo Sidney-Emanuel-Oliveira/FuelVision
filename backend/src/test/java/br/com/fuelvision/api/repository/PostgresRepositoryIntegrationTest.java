@@ -2,7 +2,9 @@ package br.com.fuelvision.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import br.com.fuelvision.api.domain.AnomalyDirection;
 import br.com.fuelvision.api.domain.PageResult;
+import br.com.fuelvision.api.domain.PriceAnomaly;
 import br.com.fuelvision.api.domain.PriceFilter;
 import br.com.fuelvision.api.domain.PriceHistoryPoint;
 import br.com.fuelvision.api.domain.PriceObservation;
@@ -83,6 +85,32 @@ class PostgresRepositoryIntegrationTest {
                 .anySatisfy(state -> assertThat(state.code()).isEqualTo("RJ"));
         assertThat(locationRepository.findCitiesWithPrices("RJ"))
                 .anySatisfy(city -> assertThat(city.name()).isEqualTo("MACAE"));
+    }
+
+    @Test
+    void detectsTheEightIqrAlertsFromTheControlledSample() {
+        PageResult<PriceAnomaly> result =
+                priceRepository.findAnomalies(emptyFilter(), 0, 20);
+
+        assertThat(result.totalItems()).isEqualTo(8);
+        assertThat(result.items()).hasSize(8).allSatisfy(anomaly -> {
+            assertThat(anomaly.referenceObservationCount()).isEqualTo(10);
+            assertThat(anomaly.direction()).isEqualTo(AnomalyDirection.ABOVE_EXPECTED_RANGE);
+            assertThat(anomaly.salePrice()).isGreaterThan(anomaly.upperBound());
+        });
+    }
+
+    @Test
+    void appliesFiltersWithoutRecalculatingTheReferenceDistribution() {
+        PriceFilter filter = new PriceFilter(
+                "GASOLINA COMUM", "AC", null, null, null);
+
+        PageResult<PriceAnomaly> result =
+                priceRepository.findAnomalies(filter, 0, 20);
+
+        assertThat(result.totalItems()).isEqualTo(2);
+        assertThat(result.items()).hasSize(2).allSatisfy(anomaly ->
+                assertThat(anomaly.referenceObservationCount()).isEqualTo(10));
     }
 
     private static PriceFilter emptyFilter() {

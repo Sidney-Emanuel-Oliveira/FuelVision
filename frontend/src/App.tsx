@@ -8,6 +8,7 @@ import {
   getSummaries,
 } from "./api/fuelVisionApi";
 import { DashboardFilters } from "./components/DashboardFilters";
+import { AnomalyPanel } from "./components/AnomalyPanel";
 import { MetricCard } from "./components/MetricCard";
 import { PredictionPanel } from "./components/PredictionPanel";
 import { StatusPanel } from "./components/StatusPanel";
@@ -328,6 +329,8 @@ export default function App() {
                 </div>
 
                 <PredictionPanel selectedProduct={summary.product} />
+
+                <AnomalyPanel filters={appliedFilters} />
 
                 <Suspense
                   fallback={

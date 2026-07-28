@@ -375,7 +375,9 @@ npm run build
 - FastAPI e Spring precisam estar ativos ao mesmo tempo;
 - não existe autenticação, cache, limite por cliente ou monitoramento;
 - não existe retreinamento automático, registro remoto ou rollback;
-- não há detecção de anomalias, Docker, CI ou deploy.
+- a detecção estatística de anomalias foi implementada separadamente no Módulo
+  10 e está documentada em `docs/analytics/ANOMALY_DETECTION.md`;
+- não há Docker, CI ou deploy.
 
 ## O que precisa ser compreendido agora
 

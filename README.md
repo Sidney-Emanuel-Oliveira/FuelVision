@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 9 — Previsão Disponível pela Aplicação** tornou o baseline por média de produto acessível no dashboard. O estimador aprovado no Módulo 8 agora é persistido com metadados, carregado por uma API FastAPI, intermediado pelo Back-end Spring Boot e apresentado como **estimativa**, com versão, período de treino, MAE e aviso de limitação.
+O **Módulo 10 — Detecção de Anomalias** adicionou uma regra IQR que sinaliza preços fora do intervalo estatístico do mesmo produto e unidade. A API informa os limites e o motivo, enquanto o dashboard apresenta cada resultado como comportamento atípico para análise — nunca como prova de fraude ou irregularidade.
 
 ## Propósito
 
@@ -12,7 +12,7 @@ O projeto pretende reunir, de forma gradual:
 - Analytics para produzir consultas e indicadores;
 - uma API para disponibilizar informações;
 - uma interface para apresentar resultados;
-- Machine Learning para experimentos de previsão e detecção de comportamentos atípicos.
+- Machine Learning para experimentos de previsão e métodos estatísticos para detectar comportamentos atípicos.
 
 Cada capacidade será construída somente no módulo correspondente. A ordem oficial está em [`docs/PLANO_FUELVISION.md`](docs/PLANO_FUELVISION.md).
 
@@ -36,10 +36,11 @@ Consulte:
 - [`docs/frontend/DASHBOARD.md`](docs/frontend/DASHBOARD.md): componentes, integração, filtros, gráficos, execução e testes do dashboard.
 - [`docs/ml/BASELINE_MODEL.md`](docs/ml/BASELINE_MODEL.md): problema preditivo, preparação temporal, baseline, Ridge, métricas e limitações.
 - [`docs/ml/MODEL_SERVING.md`](docs/ml/MODEL_SERVING.md): seleção, persistência, inferência, versionamento e integração da estimativa.
+- [`docs/analytics/ANOMALY_DETECTION.md`](docs/analytics/ANOMALY_DETECTION.md): quartis, IQR, alertas, API, dashboard e limitações.
 
 ## Pré-requisitos atuais
 
-Para executar o projeto até o Módulo 9, é necessário ter:
+Para executar o projeto até o Módulo 10, é necessário ter:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
@@ -104,6 +105,7 @@ Leia os documentos técnicos nesta ordem:
 8. `docs/frontend/DASHBOARD.md`.
 9. `docs/ml/BASELINE_MODEL.md`.
 10. `docs/ml/MODEL_SERVING.md`.
+11. `docs/analytics/ANOMALY_DETECTION.md`.
 
 ## Limitações atuais
 
@@ -125,6 +127,8 @@ Leia os documentos técnicos nesta ordem:
 - o artefato é gerado a partir de apenas 50 observações líquidas e precisa ser criado localmente antes de iniciar o serviço;
 - o serviço de inferência não possui autenticação, monitoramento, implantação produtiva ou atualização automática;
 - a estimativa é pontual e não possui intervalo de incerteza;
+- a detecção IQR usa somente dez observações por produto e pode sinalizar diferenças regionais legítimas;
+- um alerta estatístico não identifica sua causa e exige investigação humana;
 - não existem conclusões estatísticas ou métricas de negócio.
 
 Essas limitações são intencionais e preservam a progressão definida no plano.

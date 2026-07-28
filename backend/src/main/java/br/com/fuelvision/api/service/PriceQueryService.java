@@ -8,11 +8,9 @@ import br.com.fuelvision.api.dto.PageResponse;
 import br.com.fuelvision.api.dto.PriceHistoryResponse;
 import br.com.fuelvision.api.dto.PriceResponse;
 import br.com.fuelvision.api.dto.PriceSummaryResponse;
-import br.com.fuelvision.api.exception.InvalidFilterException;
 import br.com.fuelvision.api.repository.PriceRepository;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +30,8 @@ public class PriceQueryService {
             LocalDate endDate,
             int page,
             int size) {
-        PriceFilter filter = createFilter(product, state, municipality, startDate, endDate);
+        PriceFilter filter = PriceFilterFactory.create(
+                product, state, municipality, startDate, endDate);
         PageResult<PriceObservation> result = repository.findPrices(filter, page, size);
         List<PriceResponse> items = result.items().stream()
                 .map(item -> new PriceResponse(
@@ -57,7 +56,8 @@ public class PriceQueryService {
             String municipality,
             LocalDate startDate,
             LocalDate endDate) {
-        PriceFilter filter = createFilter(product, state, municipality, startDate, endDate);
+        PriceFilter filter = PriceFilterFactory.create(
+                product, state, municipality, startDate, endDate);
         return repository.summarize(filter).stream()
                 .map(summary -> new PriceSummaryResponse(
                         summary.product(),
@@ -80,7 +80,8 @@ public class PriceQueryService {
             LocalDate endDate,
             int page,
             int size) {
-        PriceFilter filter = createFilter(product, state, municipality, startDate, endDate);
+        PriceFilter filter = PriceFilterFactory.create(
+                product, state, municipality, startDate, endDate);
         PageResult<PriceHistoryPoint> result = repository.findHistory(filter, page, size);
         List<PriceHistoryResponse> items = result.items().stream()
                 .map(item -> new PriceHistoryResponse(
@@ -97,28 +98,4 @@ public class PriceQueryService {
                 items, result.totalItems(), result.totalPages(), result.page(), result.size());
     }
 
-    PriceFilter createFilter(
-            String product,
-            String state,
-            String municipality,
-            LocalDate startDate,
-            LocalDate endDate) {
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            throw new InvalidFilterException(
-                    "startDate deve ser anterior ou igual a endDate.");
-        }
-        return new PriceFilter(
-                normalize(product),
-                normalize(state),
-                normalize(municipality),
-                startDate,
-                endDate);
-    }
-
-    private String normalize(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        return value.strip().toUpperCase(Locale.ROOT);
-    }
 }

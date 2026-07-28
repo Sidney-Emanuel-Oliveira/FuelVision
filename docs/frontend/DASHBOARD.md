@@ -9,8 +9,9 @@ O Módulo 7 criou um dashboard Web responsivo que consulta a API do FuelVision e
 - comparação do preço médio entre estados;
 - filtros por combustível, estado, município e período;
 - mensagens específicas para carregamento, erro e consulta vazia;
-- tabelas alternativas com os valores utilizados nos gráficos.
-- painel de estimativa com produto, data, versão, MAE e limitações do estimador.
+- tabelas alternativas com os valores utilizados nos gráficos;
+- painel de estimativa com produto, data, versão, MAE e limitações do estimador;
+- painel de anomalias com preço, limites, referência e motivo do alerta.
 
 O dashboard não cria observações nem possui uma base fictícia de reserva. Se a API estiver indisponível, a interface informa o erro.
 
@@ -24,6 +25,9 @@ usuário → filtros React → cliente HTTP → API Spring Boot → PostgreSQL
 
 usuário → painel de estimativa → API Spring Boot → serviço Python → artefato
         ← estimativa identificada por versão, período e MAE
+
+usuário → filtros aplicados → API Spring Boot → PostgreSQL calcula IQR
+        ← alertas com limites e linguagem responsável
 ```
 
 A interface não recalcula média, mínimo ou máximo. Esses valores continuam sob responsabilidade da API e do banco, evitando regras duplicadas em duas aplicações.
@@ -121,6 +125,7 @@ Esta decisão reutiliza o contrato existente e evita antecipar um endpoint do Ba
 | `frontend/src/components/LocationComparisonChart.tsx` | gráfico de barras e tabela por UF |
 | `frontend/src/components/StatusPanel.tsx` | carregamento, erro, vazio e nova tentativa |
 | `frontend/src/components/PredictionPanel.tsx` | formulário, metadados e resultado da estimativa |
+| `frontend/src/components/AnomalyPanel.tsx` | alertas IQR, limites e estados independentes |
 | `frontend/src/utils/formatters.ts` | formatação de moeda, unidade e data em pt-BR |
 | `frontend/src/*.test.tsx` e `*.test.ts` | testes do fluxo da tela e do cliente HTTP |
 | `frontend/src/App.css` e `index.css` | identidade visual, foco, grades e media queries |
@@ -133,7 +138,7 @@ Esta decisão reutiliza o contrato existente e evita antecipar um endpoint do Ba
 - **Entrada:** produto, UF, município, datas e `AbortSignal` opcional;
 - **Processamento:** remove parâmetros vazios, codifica caracteres e verifica o status HTTP;
 - **Saída:** `Promise` com resumo, histórico ou localidade;
-- **Comunicação:** chama os endpoints analíticos e os dois endpoints preditivos;
+- **Comunicação:** chama os endpoints analíticos, preditivos e de anomalias;
 - **Possíveis erros:** API parada, resposta `400`, banco indisponível ou requisição cancelada;
 - **Verificação:** `fuelVisionApi.test.ts` confere URLs, erro seguro e comparação.
 
@@ -305,7 +310,9 @@ Esses resultados descrevem a amostra local de 60 observações, não o mercado b
 - Recharts aumenta o pacote JavaScript inicial;
 - a previsão é uma estimativa simples, limitada aos produtos e às datas informados pelo modelo;
 - uma falha preditiva não remove os indicadores analíticos já carregados;
-- não há intervalo de incerteza, anomalia, Docker, CI ou deploy.
+- os alertas IQR podem representar diferenças regionais legítimas;
+- uma anomalia não comprova fraude, erro ou irregularidade;
+- não há intervalo de incerteza, Docker, CI ou deploy.
 
 ## Extensão do Módulo 9: painel de estimativa
 
@@ -320,6 +327,20 @@ metadados do modelo
 ```
 
 Os testes verificam a seleção do produto atual, o corpo enviado, a apresentação da estimativa, os limites de data e a indisponibilidade do serviço. A suíte do Front-end possui 16 testes após essa extensão.
+
+## Extensão do Módulo 10: painel de anomalias
+
+O `AnomalyPanel` recebe os filtros aplicados, consulta `/api/prices/anomalies` e apresenta carregamento, erro, vazio ou cartões. Cada cartão informa preço, direção, localidade, data, limites, tamanho da referência, método e motivo.
+
+```text
+appliedFilters
+→ getAnomalies
+→ resposta paginada
+→ preço e limites formatados
+→ alerta acompanhado de contexto
+```
+
+Uma falha nesta consulta permanece isolada e não remove os indicadores, a previsão ou os gráficos. Os testes verificam os estados visuais, nova tentativa e codificação dos filtros. A suíte possui 20 testes após o Módulo 10.
 
 ## 13. O que compreender agora
 

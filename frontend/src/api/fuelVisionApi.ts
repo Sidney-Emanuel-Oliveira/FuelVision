@@ -2,6 +2,7 @@ import type {
   CityLocation,
   LocationComparisonPoint,
   PageResponse,
+  PriceAnomaly,
   PredictionEstimate,
   PredictionModelInfo,
   PredictionRequest,
@@ -101,6 +102,13 @@ export function getSummaries(filters: FilterParameters, signal?: AbortSignal) {
 export function getHistory(filters: FilterParameters, signal?: AbortSignal) {
   return request<PageResponse<PriceHistoryPoint>>(
     `/api/prices/history${buildQuery({ ...filters, page: 0, size: 100 })}`,
+    signal,
+  );
+}
+
+export function getAnomalies(filters: FilterParameters, signal?: AbortSignal) {
+  return request<PageResponse<PriceAnomaly>>(
+    `/api/prices/anomalies${buildQuery({ ...filters, page: 0, size: 20 })}`,
     signal,
   );
 }

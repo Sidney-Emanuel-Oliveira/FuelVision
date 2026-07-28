@@ -88,3 +88,25 @@ export interface PredictionEstimate {
   evaluationMae: number;
   warning: string;
 }
+
+export type AnomalyDirection = "BELOW_EXPECTED_RANGE" | "ABOVE_EXPECTED_RANGE";
+
+export interface PriceAnomaly {
+  id: number;
+  collectionDate: string;
+  salePrice: number;
+  product: string;
+  unit: string;
+  retailer: string;
+  stateCode: string;
+  municipality: string;
+  referenceObservationCount: number;
+  firstQuartile: number;
+  thirdQuartile: number;
+  interquartileRange: number;
+  lowerBound: number;
+  upperBound: number;
+  direction: AnomalyDirection;
+  detectionMethod: "IQR_1_5";
+  reason: string;
+}

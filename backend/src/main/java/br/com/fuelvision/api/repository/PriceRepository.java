@@ -1,6 +1,8 @@
 package br.com.fuelvision.api.repository;
 
+import br.com.fuelvision.api.domain.AnomalyDirection;
 import br.com.fuelvision.api.domain.PageResult;
+import br.com.fuelvision.api.domain.PriceAnomaly;
 import br.com.fuelvision.api.domain.PriceFilter;
 import br.com.fuelvision.api.domain.PriceHistoryPoint;
 import br.com.fuelvision.api.domain.PriceObservation;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class PriceRepository {
+
+    private static final int MINIMUM_REFERENCE_OBSERVATIONS = 4;
 
     private static final String BASE_FROM = """
             FROM fuelvision.price_observations AS observations
@@ -145,6 +149,94 @@ public class PriceRepository {
         Long total = jdbc.queryForObject(countSql, queryParts.parameters(), Long.class);
 
         return new PageResult<>(items, total == null ? 0 : total, page, size);
+    }
+
+    public PageResult<PriceAnomaly> findAnomalies(
+            PriceFilter filter, int page, int size) {
+        QueryParts queryParts = buildFilters(filter);
+        Map<String, Object> parameters = withPagination(queryParts.parameters(), page, size);
+        parameters.put("minimumReferenceObservations", MINIMUM_REFERENCE_OBSERVATIONS);
+
+        String detectedAnomalies = anomalyCandidatesSql(queryParts.whereClause());
+        String anomalyCondition = """
+                WHERE sale_price < lower_bound OR sale_price > upper_bound
+                """;
+        String dataSql = "SELECT * FROM (" + detectedAnomalies + ") AS detected "
+                + anomalyCondition
+                + " ORDER BY collection_date DESC, product, id LIMIT :limit OFFSET :offset";
+
+        List<PriceAnomaly> items = jdbc.query(dataSql, parameters, (resultSet, rowNumber) ->
+                new PriceAnomaly(
+                        resultSet.getLong("id"),
+                        resultSet.getObject("collection_date", java.time.LocalDate.class),
+                        resultSet.getBigDecimal("sale_price"),
+                        resultSet.getString("product"),
+                        resultSet.getString("unit"),
+                        resultSet.getString("retailer"),
+                        resultSet.getString("state_code").trim(),
+                        resultSet.getString("municipality"),
+                        resultSet.getLong("reference_observation_count"),
+                        resultSet.getBigDecimal("first_quartile"),
+                        resultSet.getBigDecimal("third_quartile"),
+                        resultSet.getBigDecimal("interquartile_range"),
+                        resultSet.getBigDecimal("lower_bound"),
+                        resultSet.getBigDecimal("upper_bound"),
+                        AnomalyDirection.valueOf(resultSet.getString("direction"))));
+
+        Map<String, Object> countParameters = new HashMap<>(queryParts.parameters());
+        countParameters.put("minimumReferenceObservations", MINIMUM_REFERENCE_OBSERVATIONS);
+        Long total = jdbc.queryForObject(
+                "SELECT count(*) FROM (" + detectedAnomalies + ") AS detected "
+                        + anomalyCondition,
+                countParameters,
+                Long.class);
+
+        return new PageResult<>(items, total == null ? 0 : total, page, size);
+    }
+
+    private String anomalyCandidatesSql(String whereClause) {
+        String boundsJoin = """
+                JOIN (
+                    SELECT reference.product_id,
+                           count(*) AS reference_observation_count,
+                           CAST(percentile_cont(0.25) WITHIN GROUP (
+                               ORDER BY reference.sale_price
+                           ) AS numeric) AS first_quartile,
+                           CAST(percentile_cont(0.75) WITHIN GROUP (
+                               ORDER BY reference.sale_price
+                           ) AS numeric) AS third_quartile
+                    FROM fuelvision.price_observations AS reference
+                    GROUP BY reference.product_id
+                    HAVING count(*) >= :minimumReferenceObservations
+                ) AS bounds ON bounds.product_id = observations.product_id
+                """;
+        return """
+                SELECT observations.id,
+                       observations.collection_date,
+                       observations.sale_price,
+                       products.name AS product,
+                       products.unit,
+                       retailers.name AS retailer,
+                       states.code AS state_code,
+                       municipalities.name AS municipality,
+                       bounds.reference_observation_count,
+                       bounds.first_quartile,
+                       bounds.third_quartile,
+                       bounds.third_quartile - bounds.first_quartile
+                           AS interquartile_range,
+                       bounds.first_quartile - 1.5 * (
+                           bounds.third_quartile - bounds.first_quartile
+                       ) AS lower_bound,
+                       bounds.third_quartile + 1.5 * (
+                           bounds.third_quartile - bounds.first_quartile
+                       ) AS upper_bound,
+                       CASE
+                           WHEN observations.sale_price < bounds.first_quartile - 1.5 * (
+                               bounds.third_quartile - bounds.first_quartile
+                           ) THEN 'BELOW_EXPECTED_RANGE'
+                           ELSE 'ABOVE_EXPECTED_RANGE'
+                       END AS direction
+                """ + BASE_FROM + boundsJoin + whereClause;
     }
 
     private QueryParts buildFilters(PriceFilter filter) {

@@ -4,7 +4,7 @@
 
 O Módulo 6 criou uma API REST somente para leitura, desenvolvida com Java e Spring Boot. Ela consulta as observações e os indicadores que já existem no PostgreSQL e devolve respostas JSON.
 
-O Módulo 6 disponibilizou cinco endpoints analíticos. O Módulo 9 acrescentou dois endpoints que integram o serviço Python de inferência:
+O Módulo 6 disponibilizou cinco endpoints analíticos. O Módulo 9 acrescentou dois endpoints de inferência e o Módulo 10 adicionou a consulta de anomalias:
 
 | Método | Caminho                         | Responsabilidade                                  |
 | ------ | ------------------------------- | ------------------------------------------------- |
@@ -15,6 +15,7 @@ O Módulo 6 disponibilizou cinco endpoints analíticos. O Módulo 9 acrescentou 
 | GET    | `/api/locations/cities?state=RJ`| listar municípios com preços em uma UF             |
 | GET    | `/api/predictions/model`        | consultar metadados do estimador ativo             |
 | POST   | `/api/predictions`              | solicitar uma estimativa para produto e data       |
+| GET    | `/api/prices/anomalies`          | listar preços fora dos limites do IQR               |
 
 A API não altera o banco e não cria dados fictícios.
 
@@ -48,7 +49,7 @@ O dashboard consome esse contrato sem acessar diretamente o PostgreSQL nem o ser
 
 ### Service
 
-**Service** aplica regras do caso de uso. `PriceQueryService` transforma filtros em maiúsculas, converte valores em DTOs e impede que a data inicial seja posterior à final.
+**Service** aplica regras do caso de uso. `PriceQueryService` converte valores em DTOs, enquanto `PriceFilterFactory` centraliza a normalização dos filtros e impede que a data inicial seja posterior à final.
 
 ### Repository
 
@@ -220,18 +221,19 @@ Suíte completa:
 backend/scripts/test.sh --with-postgres
 ```
 
-O segundo comando lê o `.env` local e ativa quatro testes de integração. Nenhuma senha é escrita no relatório dos testes.
+O segundo comando lê o `.env` local e ativa seis testes de integração. Nenhuma senha é escrita no relatório dos testes.
 
 ## 11. Resultados verificados
 
-- 22 testes Java aprovados com PostgreSQL ativado;
+- 29 testes Java aprovados com PostgreSQL ativado;
 - 60 observações encontradas pelo repository;
 - 14 grupos de data + produto no histórico completo;
 - cinco endpoints responderam `200`;
 - os dois endpoints de previsão responderam `200` na integração entre Python e Java;
 - `size=101` respondeu `400` com `ProblemDetail`;
 - filtro GNV + RJ + MACAE retornou 2 observações e média `4.935`;
-- OpenAPI 3.1 foi gerado com os sete caminhos e esquemas de erro.
+- oito alertas IQR foram encontrados na amostra completa;
+- OpenAPI 3.1 descreve os oito caminhos e esquemas de erro.
 
 Esses números descrevem apenas a amostra controlada já documentada. Não representam o mercado brasileiro.
 
@@ -297,6 +299,8 @@ Instale Maven 3.6.3 ou mais recente. O ambiente validado utiliza Maven 3.9.16.
 - o serviço de inferência precisa estar ativo para os dois endpoints preditivos;
 - indisponibilidade do serviço Python é convertida em `503`, sem expor detalhes internos;
 - as estimativas herdam todas as limitações do baseline documentadas em `docs/ml/MODEL_SERVING.md`.
+- os alertas IQR podem ser falsos positivos e não comprovam fraude ou irregularidade;
+- a referência estatística possui apenas dez observações por produto.
 
 ## Extensão do Módulo 9: cliente de inferência
 
@@ -318,6 +322,23 @@ curl -X POST 'http://localhost:8080/api/predictions' \
 ```
 
 Um produto incompatível ou uma data fora da janela retorna `400`. Se o serviço Python estiver parado, o Back-end retorna `503`. Os testes de `PredictionController`, `PredictionService`, `PredictionClient` e do contexto Spring verificam essas fronteiras.
+
+## Extensão do Módulo 10: detecção de anomalias
+
+`AnomalyController` publica `GET /api/prices/anomalies`. O repository calcula Q1 e Q3 com `percentile_cont`, deriva `IQR = Q3 − Q1` e seleciona preços abaixo de `Q1 − 1,5 × IQR` ou acima de `Q3 + 1,5 × IQR`.
+
+```text
+filtros HTTP → AnomalyService → PriceRepository → PostgreSQL
+             ← preço + limites + direção + motivo
+```
+
+Exemplo:
+
+```bash
+curl 'http://localhost:8080/api/prices/anomalies?product=GASOLINA%20COMUM&state=AC'
+```
+
+Os filtros selecionam os alertas exibidos, mas a referência continua usando todas as observações do produto. Grupos com menos de quatro linhas não geram alerta. A definição completa, resultados e limitações estão em `docs/analytics/ANOMALY_DETECTION.md`.
 
 ## 15. O que compreender agora
 
