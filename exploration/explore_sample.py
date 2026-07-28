@@ -8,7 +8,6 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Dict, List
 
-
 SAMPLE_PATH = (
     Path(__file__).resolve().parents[1]
     / "data"
@@ -129,9 +128,7 @@ def print_summary(summary: Dict[str, object]) -> None:
     print(f"Product/unit inconsistencies: {summary['inconsistent_unit_count']}")
 
     missing = {
-        column: count
-        for column, count in summary["missing_by_column"].items()
-        if count
+        column: count for column, count in summary["missing_by_column"].items() if count
     }
     whitespace = {
         column: count

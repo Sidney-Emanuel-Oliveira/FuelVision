@@ -14,6 +14,7 @@ fi
 
 set -a
 # O arquivo local pertence ao desenvolvedor e deve conter somente atribuições.
+# shellcheck source=/dev/null
 source "${ENV_FILE}"
 set +a
 

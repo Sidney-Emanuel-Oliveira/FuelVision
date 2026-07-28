@@ -13,7 +13,6 @@ from typing import Dict, Optional, Sequence, Tuple
 
 from pipeline.schema import INGESTION_REQUIRED_COLUMNS
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "raw"
 DEFAULT_LOG_PATH = PROJECT_ROOT / "logs" / "ingestion.log"
@@ -63,7 +62,9 @@ def read_and_validate_header(source: Path) -> Tuple[str, ...]:
         with source.open(encoding="utf-8-sig", newline="") as csv_file:
             header = next(csv.reader(csv_file, delimiter=";"), None)
     except (OSError, UnicodeDecodeError, csv.Error) as error:
-        raise SchemaValidationError(f"Could not read the CSV header: {error}") from error
+        raise SchemaValidationError(
+            f"Could not read the CSV header: {error}"
+        ) from error
 
     if not header:
         raise SchemaValidationError("The CSV file is empty or has no header.")
@@ -119,7 +120,7 @@ def copy_without_overwrite(source: Path, destination: Path, digest: str) -> str:
             return "already_exists"
         raise DestinationConflictError(
             f"Destination was created concurrently with different content: {destination}"
-        )
+        ) from None
     except OSError as error:
         if destination_created:
             destination.unlink(missing_ok=True)
@@ -132,7 +133,9 @@ def copy_without_overwrite(source: Path, destination: Path, digest: str) -> str:
     return "created"
 
 
-def ingest_file(source: Path, output_dir: Path = DEFAULT_OUTPUT_DIR) -> Dict[str, object]:
+def ingest_file(
+    source: Path, output_dir: Path = DEFAULT_OUTPUT_DIR
+) -> Dict[str, object]:
     """Run the raw ingestion flow and return its auditable result."""
     source = source.expanduser().resolve()
     output_dir = output_dir.expanduser().resolve()
@@ -168,7 +171,9 @@ def configure_logging(log_path: Path) -> None:
         log_path.parent.mkdir(parents=True, exist_ok=True)
         file_handler = logging.FileHandler(log_path, encoding="utf-8")
     except OSError as error:
-        raise IngestionError(f"Could not create or open log file: {log_path}") from error
+        raise IngestionError(
+            f"Could not create or open log file: {log_path}"
+        ) from error
 
     logging.basicConfig(
         level=logging.INFO,

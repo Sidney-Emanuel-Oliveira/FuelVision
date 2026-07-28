@@ -13,6 +13,7 @@ fi
 
 set -a
 # The local file is controlled by the developer and must contain only assignments.
+# shellcheck source=/dev/null
 source "${ENV_FILE}"
 set +a
 

@@ -7,7 +7,6 @@ from typing import Mapping, Optional, Sequence, Tuple
 
 from pipeline.transform_data import transform_file
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_PATH = PROJECT_ROOT / "data" / "samples" / "precos-combustiveis-amostra.csv"
 

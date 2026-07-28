@@ -9,10 +9,7 @@ from postgres_test_support import (
     run_project_command,
 )
 
-
-CREATE_VIEWS_PATH = (
-    PROJECT_ROOT / "database" / "sql" / "004_create_analytics_views.sql"
-)
+CREATE_VIEWS_PATH = PROJECT_ROOT / "database" / "sql" / "004_create_analytics_views.sql"
 REPORT_PATH = PROJECT_ROOT / "database" / "sql" / "005_analysis_report.sql"
 VALIDATION_PATH = PROJECT_ROOT / "database" / "sql" / "006_validate_analytics.sql"
 CREATE_SCHEMA_SCRIPT = PROJECT_ROOT / "database" / "scripts" / "create_schema.sh"

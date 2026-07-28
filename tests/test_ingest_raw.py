@@ -17,7 +17,6 @@ from pipeline.ingest_raw import (
     ingest_file,
 )
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_PATH = PROJECT_ROOT / "data" / "samples" / "precos-combustiveis-amostra.csv"
 
@@ -45,7 +44,9 @@ class IngestRawTest(unittest.TestCase):
 
         self.assertEqual(second_result["status"], "already_exists")
         self.assertEqual(second_result["destination"].stat().st_ino, first_inode)
-        self.assertEqual(second_result["destination"].read_bytes(), SAMPLE_PATH.read_bytes())
+        self.assertEqual(
+            second_result["destination"].read_bytes(), SAMPLE_PATH.read_bytes()
+        )
 
     def test_missing_input_is_rejected(self) -> None:
         with self.assertRaises(InputFileNotFoundError):

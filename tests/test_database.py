@@ -5,13 +5,13 @@ import shutil
 import unittest
 from pathlib import Path
 
-from pipeline.schema import PROCESSED_COLUMNS
 from postgres_test_support import (
     PROJECT_ROOT,
     create_processed_fixture,
     run_project_command,
 )
 
+from pipeline.schema import PROCESSED_COLUMNS
 
 SCHEMA_PATH = PROJECT_ROOT / "database" / "sql" / "001_create_schema.sql"
 PREPARE_LOAD_PATH = PROJECT_ROOT / "database" / "sql" / "002_prepare_load.sql"
@@ -207,15 +207,13 @@ class DatabaseIntegrationTest(unittest.TestCase):
 
     def test_repeated_load_is_idempotent(self) -> None:
         before = self._run_psql_command(
-            "SELECT count(*) || '|' || max(updated_at)::text "
-            "FROM fuelvision.retailers;"
+            "SELECT count(*) || '|' || max(updated_at)::text FROM fuelvision.retailers;"
         ).stdout.strip()
 
         self._run_loader()
 
         after = self._run_psql_command(
-            "SELECT count(*) || '|' || max(updated_at)::text "
-            "FROM fuelvision.retailers;"
+            "SELECT count(*) || '|' || max(updated_at)::text FROM fuelvision.retailers;"
         ).stdout.strip()
         observation_count = self._run_psql_command(
             "SELECT count(*) FROM fuelvision.price_observations;"

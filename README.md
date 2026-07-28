@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 10 — Detecção de Anomalias** adicionou uma regra IQR que sinaliza preços fora do intervalo estatístico do mesmo produto e unidade. A API informa os limites e o motivo, enquanto o dashboard apresenta cada resultado como comportamento atípico para análise — nunca como prova de fraude ou irregularidade.
+O **Módulo 11 — Qualidade, Docker e Integração Contínua** tornou os quatro serviços reproduzíveis com Docker Compose, health checks, lint, testes, builds e GitHub Actions. O ambiente completo sobe com a amostra controlada, usuário PostgreSQL restrito e o Nginx encaminhando o dashboard para a API.
 
 ## Propósito
 
@@ -37,10 +37,16 @@ Consulte:
 - [`docs/ml/BASELINE_MODEL.md`](docs/ml/BASELINE_MODEL.md): problema preditivo, preparação temporal, baseline, Ridge, métricas e limitações.
 - [`docs/ml/MODEL_SERVING.md`](docs/ml/MODEL_SERVING.md): seleção, persistência, inferência, versionamento e integração da estimativa.
 - [`docs/analytics/ANOMALY_DETECTION.md`](docs/analytics/ANOMALY_DETECTION.md): quartis, IQR, alertas, API, dashboard e limitações.
+- [`docs/quality/DOCKER_E_INTEGRACAO_CONTINUA.md`](docs/quality/DOCKER_E_INTEGRACAO_CONTINUA.md): imagens, serviços, health checks, lint, CI e operação do ambiente.
 
 ## Pré-requisitos atuais
 
-Para executar o projeto até o Módulo 10, é necessário ter:
+Para executar o projeto até o Módulo 11 pelo ambiente reproduzível, é necessário ter:
+
+- Git;
+- Docker com o plugin Docker Compose.
+
+Para executar cada tecnologia diretamente no computador e desenvolver fora dos contêineres, também são necessários:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
@@ -54,6 +60,22 @@ Para executar o projeto até o Módulo 10, é necessário ter:
 O serviço de estimativas requer um ambiente virtual com as versões de pandas, scikit-learn, joblib, FastAPI e Uvicorn fixadas em `ml/requirements.txt`. Não foi adicionado driver Python de PostgreSQL porque a carga continua utilizando o cliente oficial `psql`.
 
 ## Como executar
+
+### Ambiente completo com Docker
+
+Na raiz do projeto:
+
+```bash
+cp .env.example .env
+docker compose config --quiet
+docker compose build
+docker compose up --detach --wait
+docker compose ps
+```
+
+Substitua as senhas de exemplo somente no `.env`, que é ignorado pelo Git. O dashboard fica em `http://localhost:5173`. Para encerrar preservando o volume do banco, execute `docker compose down`.
+
+### Execução direta para desenvolvimento
 
 Na raiz do projeto, execute:
 
@@ -93,6 +115,12 @@ npm run dev
 
 Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. Os comandos com `FUELVISION_RUN_DB_TESTS=1` e `--with-postgres` ativam os testes que exigem PostgreSQL. Para usar todo o dashboard, mantenha o serviço Python, `backend/scripts/run.sh` e `npm run dev` em três terminais separados. O artefato em `ml/artifacts/` é gerado localmente e não é versionado.
 
+Todas as verificações locais podem ser reunidas com:
+
+```bash
+scripts/quality.sh --with-postgres
+```
+
 Leia os documentos técnicos nesta ordem:
 
 1. `docs/pipeline/INGESTAO_RAW.md`;
@@ -106,6 +134,7 @@ Leia os documentos técnicos nesta ordem:
 9. `docs/ml/BASELINE_MODEL.md`.
 10. `docs/ml/MODEL_SERVING.md`.
 11. `docs/analytics/ANOMALY_DETECTION.md`.
+12. `docs/quality/DOCKER_E_INTEGRACAO_CONTINUA.md`.
 
 ## Limitações atuais
 
@@ -130,6 +159,10 @@ Leia os documentos técnicos nesta ordem:
 - a detecção IQR usa somente dez observações por produto e pode sinalizar diferenças regionais legítimas;
 - um alerta estatístico não identifica sua causa e exige investigação humana;
 - não existem conclusões estatísticas ou métricas de negócio.
+- o Compose é destinado a desenvolvimento e CI, sem TLS, backup ou gestão profissional de segredos;
+- as imagens Docker são locais e não são publicadas em registry;
+- os health checks confirmam disponibilidade, mas não desempenho ou capacidade;
+- o GitHub Actions valida o projeto, mas não executa deploy.
 
 Essas limitações são intencionais e preservam a progressão definida no plano.
 

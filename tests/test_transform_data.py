@@ -18,7 +18,6 @@ from pipeline.transform_data import (
     transform_record,
 )
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_PATH = PROJECT_ROOT / "data" / "samples" / "precos-combustiveis-amostra.csv"
 
@@ -136,9 +135,7 @@ class TransformDataTest(unittest.TestCase):
     def test_conflicting_duplicate_is_rejected(self) -> None:
         conflicting_record = dict(self.first_source_record)
         conflicting_record["Valor de Venda"] = "9,99"
-        source_path = self._write_source(
-            [self.first_source_record, conflicting_record]
-        )
+        source_path = self._write_source([self.first_source_record, conflicting_record])
 
         result = transform_file(source_path, self.output_dir)
 
@@ -202,7 +199,9 @@ class TransformDataTest(unittest.TestCase):
         source_path.write_text(
             ";".join(ANP_SOURCE_COLUMNS)
             + "\n"
-            + ";".join(self.first_source_record[column] for column in ANP_SOURCE_COLUMNS)
+            + ";".join(
+                self.first_source_record[column] for column in ANP_SOURCE_COLUMNS
+            )
             + ";EXTRA\n",
             encoding="utf-8",
         )
@@ -216,9 +215,7 @@ class TransformDataTest(unittest.TestCase):
     def test_unexpected_source_column_is_rejected(self) -> None:
         fieldnames = ANP_SOURCE_COLUMNS + ("Unexpected",)
         unexpected_record = {**self.first_source_record, "Unexpected": "value"}
-        source_path = self._write_source(
-            [unexpected_record], fieldnames=fieldnames
-        )
+        source_path = self._write_source([unexpected_record], fieldnames=fieldnames)
 
         with self.assertRaisesRegex(TransformationError, "unexpected=Unexpected"):
             transform_file(source_path, self.output_dir)

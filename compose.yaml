@@ -1,0 +1,70 @@
+name: fuelvision
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: database/Dockerfile
+    environment:
+      POSTGRES_DB: fuelvision
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:-fuelvision_admin_local}
+      FUELVISION_DB_USER: fuelvision_app
+      FUELVISION_DB_PASSWORD: ${POSTGRES_PASSWORD:-fuelvision_app_local}
+    ports:
+      - "127.0.0.1:${FUELVISION_DOCKER_POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - fuelvision_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          PGPASSWORD=$${FUELVISION_DB_PASSWORD} psql
+          --host=127.0.0.1 --username=$${FUELVISION_DB_USER}
+          --dbname=$${POSTGRES_DB} --tuples-only
+          --command='SELECT count(*) FROM fuelvision.price_observations'
+          | grep -q '60'
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 9
+
+  prediction:
+    build:
+      context: .
+      dockerfile: ml/Dockerfile
+    ports:
+      - "127.0.0.1:${FUELVISION_PREDICTION_PORT:-8000}:8000"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: fuelvision
+      POSTGRES_USER: fuelvision_app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fuelvision_app_local}
+      POSTGRES_SSLMODE: disable
+      FUELVISION_PREDICTION_URL: http://prediction:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prediction:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${FUELVISION_BACKEND_PORT:-8080}:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${FUELVISION_FRONTEND_PORT:-5173}:80"
+
+volumes:
+  fuelvision_postgres_data:

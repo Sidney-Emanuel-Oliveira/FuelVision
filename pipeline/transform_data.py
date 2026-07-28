@@ -24,7 +24,6 @@ from pipeline.ingest_raw import (
 )
 from pipeline.schema import ANP_SOURCE_COLUMNS, PROCESSED_COLUMNS
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 DEFAULT_TRANSFORMATION_LOG_PATH = PROJECT_ROOT / "logs" / "transformation.log"
@@ -168,7 +167,9 @@ def normalize_product(value: str) -> str:
     try:
         return PRODUCT_ALIASES[source_product]
     except KeyError as error:
-        raise ValueError(f"unsupported product: {source_product or '<empty>'}") from error
+        raise ValueError(
+            f"unsupported product: {source_product or '<empty>'}"
+        ) from error
 
 
 def normalize_unit(value: str) -> str:
@@ -390,8 +391,12 @@ def transform_file(
             reader = csv.DictReader(source_file, delimiter=";")
             validate_source_header(reader.fieldnames)
 
-            with processed_temp.open("w", encoding="utf-8", newline="") as processed_file:
-                with rejected_temp.open("w", encoding="utf-8", newline="") as rejected_file:
+            with processed_temp.open(
+                "w", encoding="utf-8", newline=""
+            ) as processed_file:
+                with rejected_temp.open(
+                    "w", encoding="utf-8", newline=""
+                ) as rejected_file:
                     processed_writer = csv.DictWriter(
                         processed_file,
                         fieldnames=PROCESSED_COLUMNS,
@@ -419,7 +424,9 @@ def transform_file(
                                 processed["product"],
                                 processed["collection_date"],
                             )
-                            signature = tuple(processed[column] for column in PROCESSED_COLUMNS)
+                            signature = tuple(
+                                processed[column] for column in PROCESSED_COLUMNS
+                            )
                             previous_signature = seen_business_keys.get(business_key)
                             if previous_signature is not None:
                                 if previous_signature == signature:
@@ -487,7 +494,9 @@ def transform_file(
                 encoding="utf-8",
             )
         except OSError as error:
-            raise TransformationError("Could not write transformation manifest.") from error
+            raise TransformationError(
+                "Could not write transformation manifest."
+            ) from error
 
         manifest_hash = calculate_sha256(manifest_temp)
         outputs = (
