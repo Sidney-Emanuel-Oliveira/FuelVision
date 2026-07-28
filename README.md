@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 6 — API Back-end com Java e Spring Boot** disponibilizou cinco endpoints REST somente para leitura. A API consulta observações, resumos, histórico e localidades no PostgreSQL, valida filtros, pagina resultados, padroniza erros e publica documentação OpenAPI/Swagger. Ainda não existe interface ou modelo de Machine Learning.
+O **Módulo 7 — Dashboard React e TypeScript** disponibilizou uma interface responsiva conectada à API real. O painel apresenta indicadores, evolução histórica, comparação entre estados e filtros, com tratamento de carregamento, erro e resposta vazia. Ainda não existe modelo de Machine Learning.
 
 ## Propósito
 
@@ -33,10 +33,11 @@ Consulte:
 - [`docs/database/POSTGRESQL_LOCAL.md`](docs/database/POSTGRESQL_LOCAL.md): configuração, carga e testes do banco local;
 - [`docs/database/ANALISES_SQL.md`](docs/database/ANALISES_SQL.md): indicadores, filtros, resultados e limitações analíticas.
 - [`docs/backend/API_BACKEND.md`](docs/backend/API_BACKEND.md): arquitetura, endpoints, execução, testes e limites da API.
+- [`docs/frontend/DASHBOARD.md`](docs/frontend/DASHBOARD.md): componentes, integração, filtros, gráficos, execução e testes do dashboard.
 
 ## Pré-requisitos atuais
 
-Para executar o projeto até o Módulo 6, é necessário ter:
+Para executar o projeto até o Módulo 7, é necessário ter:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
@@ -44,6 +45,7 @@ Para executar o projeto até o Módulo 6, é necessário ter:
 - PostgreSQL 17 com `psql`, `createdb` e `createuser`;
 - Java 21 ou mais recente;
 - Maven 3.6.3 ou mais recente;
+- Node.js compatível com Vite 8 e npm;
 - um terminal para executar os comandos documentados.
 
 O código Python continua utilizando somente a biblioteca padrão. Não foi adicionado driver Python de PostgreSQL porque a carga deste módulo utiliza o cliente oficial `psql`.
@@ -68,9 +70,17 @@ FUELVISION_RUN_DB_TESTS=1 python3 -m unittest discover -s tests -v
 backend/scripts/test.sh
 backend/scripts/test.sh --with-postgres
 backend/scripts/run.sh
+cd frontend
+npm install
+npm run typecheck
+npm run lint
+npm run format:check
+npm test
+npm run build
+npm run dev
 ```
 
-Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. O último comando ativa os testes que exigem PostgreSQL em execução.
+Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. Os comandos com `FUELVISION_RUN_DB_TESTS=1` e `--with-postgres` ativam os testes que exigem PostgreSQL. Execute `backend/scripts/run.sh` e `npm run dev` em terminais separados quando quiser usar o dashboard.
 
 Leia os documentos técnicos nesta ordem:
 
@@ -81,6 +91,7 @@ Leia os documentos técnicos nesta ordem:
 5. `docs/database/POSTGRESQL_LOCAL.md`;
 6. `docs/database/ANALISES_SQL.md`;
 7. `docs/backend/API_BACKEND.md`.
+8. `docs/frontend/DASHBOARD.md`.
 
 ## Limitações atuais
 
@@ -91,8 +102,10 @@ Leia os documentos técnicos nesta ordem:
 - a evolução diária não acompanha o mesmo conjunto de revendas em todas as datas;
 - o modelo guarda o estado atual da revenda, não seu histórico de alterações;
 - ainda não há ferramenta de migração ou histórico de lotes carregados;
-- a API é somente leitura e ainda não possui autenticação, CORS, cache ou limite por cliente;
-- nenhuma interface foi criada;
+- a API é somente leitura e ainda não possui autenticação, CORS de produção, cache ou limite por cliente;
+- a comparação do dashboard realiza uma consulta de resumo por estado;
+- o histórico exibido pelo dashboard está limitado a 100 pontos por consulta;
+- não houve auditoria completa de acessibilidade com tecnologia assistiva;
 - nenhum modelo de Machine Learning foi desenvolvido;
 - não existem conclusões estatísticas ou métricas de negócio.
 
