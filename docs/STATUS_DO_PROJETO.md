@@ -6,7 +6,7 @@ Atualizado em: 28/07/2026.
 | ------ | --------------------------------------- | ------------ | ---------- | -------------------------------------------------------------------------------- |
 | 0      | Fundação e Planejamento                 | Concluído    | 27/07/2026 | README, `.gitignore`, proposta, arquitetura planejada e documentação educacional |
 | 1      | Fonte de Dados e Exploração             | Concluído    | 28/07/2026 | Fonte oficial, amostra controlada, dicionário, exploração e testes               |
-| 2      | Ingestão da Camada Raw                  | Não iniciado | —          | —                                                                                |
+| 2      | Ingestão da Camada Raw                  | Concluído    | 28/07/2026 | Pipeline raw idempotente, validações, integridade, logs e 11 testes              |
 | 3      | Limpeza, Transformação e Validação      | Não iniciado | —          | —                                                                                |
 | 4      | PostgreSQL e Modelagem de Dados         | Não iniciado | —          | —                                                                                |
 | 5      | Análises e Consultas SQL                | Não iniciado | —          | —                                                                                |
@@ -20,4 +20,4 @@ Atualizado em: 28/07/2026.
 
 ## Observação
 
-Os Módulos 0 e 1 estão concluídos. Os demais módulos permanecem sem arquivos ou funcionalidades implementadas e aguardam autorização.
+Os Módulos 0, 1 e 2 estão concluídos. Os demais módulos aguardam autorização.

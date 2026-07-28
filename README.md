@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 1 — Fonte de Dados e Exploração** adicionou uma amostra pequena e rastreável dos dados oficiais da ANP, um leitor exploratório em Python e documentação sobre estrutura e qualidade. Ainda não existe pipeline, banco de dados, API, interface ou modelo de Machine Learning.
+O **Módulo 2 — Ingestão da Camada Raw** adicionou o primeiro pipeline Python. Ele valida condições mínimas de um CSV e preserva seus bytes na camada raw, sem realizar limpeza ou transformação. Ainda não existe banco de dados, API, interface ou modelo de Machine Learning.
 
 ## Propósito
 
@@ -28,10 +28,12 @@ Consulte:
 - [`docs/dados/DICIONARIO_DADOS.md`](docs/dados/DICIONARIO_DADOS.md): significado dos 16 campos;
 - [`docs/dados/RELATORIO_EXPLORACAO.md`](docs/dados/RELATORIO_EXPLORACAO.md): resultados e limitações;
 - [`docs/aprendizado/modulo-01-guia.md`](docs/aprendizado/modulo-01-guia.md): material educacional do Módulo 1.
+- [`docs/pipeline/INGESTAO_RAW.md`](docs/pipeline/INGESTAO_RAW.md): operação e regras da ingestão raw;
+- [`docs/aprendizado/modulo-02-guia.md`](docs/aprendizado/modulo-02-guia.md): material educacional do Módulo 2.
 
-## Pré-requisitos do Módulo 1
+## Pré-requisitos atuais
 
-Para executar a exploração, basta ter:
+Para executar as ferramentas atuais, basta ter:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
@@ -40,29 +42,28 @@ Para executar a exploração, basta ter:
 
 O script utiliza somente a biblioteca padrão do Python. Pandas não é necessário neste módulo.
 
-## Como executar a exploração
+## Como executar
 
 Na raiz do projeto, execute:
 
 ```bash
 python3 exploration/explore_sample.py
+python3 pipeline/ingest_raw.py data/samples/precos-combustiveis-amostra.csv
 python3 -m unittest discover -s tests -v
 ```
 
-O primeiro comando apresenta o perfil da amostra. O segundo executa os testes básicos de leitura e estrutura.
+O primeiro comando apresenta o perfil da amostra. O segundo preserva essa entrada na camada raw. O terceiro executa todos os testes.
 
-Leia os documentos do Módulo 1 nesta ordem:
+Leia os documentos do Módulo 2 nesta ordem:
 
-1. `docs/dados/FONTE_DADOS_ANP.md`;
-2. `docs/dados/DICIONARIO_DADOS.md`;
-3. `docs/dados/RELATORIO_EXPLORACAO.md`;
-4. `docs/aprendizado/modulo-01-guia.md`;
-5. `docs/aprendizado/modulo-01-exercicios.md`.
+1. `docs/pipeline/INGESTAO_RAW.md`;
+2. `docs/aprendizado/modulo-02-guia.md`;
+3. `docs/aprendizado/modulo-02-exercicios.md`.
 
 ## Limitações atuais
 
 - somente uma amostra não representativa foi versionada;
-- nenhum pipeline de ingestão foi implementado;
+- o pipeline apenas preserva a entrada; não limpa nem transforma registros;
 - nenhum banco foi configurado;
 - nenhuma API ou interface foi criada;
 - nenhum modelo de Machine Learning foi desenvolvido;
