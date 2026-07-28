@@ -101,13 +101,13 @@ O log contém caminhos locais e horários, portanto não é uma saída determin�
 Na raiz do projeto:
 
 ```bash
-python3 pipeline/ingest_raw.py data/samples/precos-combustiveis-amostra.csv
+python3 -m pipeline.ingest_raw data/samples/precos-combustiveis-amostra.csv
 ```
 
 Para escolher outros diretórios:
 
 ```bash
-python3 pipeline/ingest_raw.py caminho/entrada.csv \
+python3 -m pipeline.ingest_raw caminho/entrada.csv \
   --output-dir caminho/raw \
   --log-file caminho/logs/ingestion.log
 ```

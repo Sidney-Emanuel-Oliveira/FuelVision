@@ -11,19 +11,14 @@ import sys
 from pathlib import Path
 from typing import Dict, Optional, Sequence, Tuple
 
+from pipeline.schema import INGESTION_REQUIRED_COLUMNS
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data" / "raw"
 DEFAULT_LOG_PATH = PROJECT_ROOT / "logs" / "ingestion.log"
 
-REQUIRED_COLUMNS = (
-    "Estado - Sigla",
-    "Municipio",
-    "Produto",
-    "Data da Coleta",
-    "Valor de Venda",
-    "Unidade de Medida",
-)
+REQUIRED_COLUMNS = INGESTION_REQUIRED_COLUMNS
 
 LOGGER = logging.getLogger(__name__)
 

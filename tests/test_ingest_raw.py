@@ -98,7 +98,8 @@ class IngestRawTest(unittest.TestCase):
         process = subprocess.run(
             [
                 sys.executable,
-                str(PROJECT_ROOT / "pipeline" / "ingest_raw.py"),
+                "-m",
+                "pipeline.ingest_raw",
                 str(SAMPLE_PATH),
                 "--output-dir",
                 str(self.output_dir),
@@ -120,7 +121,8 @@ class IngestRawTest(unittest.TestCase):
         process = subprocess.run(
             [
                 sys.executable,
-                str(PROJECT_ROOT / "pipeline" / "ingest_raw.py"),
+                "-m",
+                "pipeline.ingest_raw",
                 str(self.temp_path / "missing.csv"),
                 "--output-dir",
                 str(self.output_dir),
