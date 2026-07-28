@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 3 — Limpeza, Transformação e Validação** adicionou a conversão dos dados brutos em registros processados, com padronização, regras de qualidade, separação de rejeitados e manifesto reproduzível. Ainda não existe banco de dados, API, interface ou modelo de Machine Learning.
+O **Módulo 4 — PostgreSQL e Modelagem de Dados** adicionou armazenamento relacional para os dados processados. O banco possui tabelas conectadas, restrições de qualidade, carga idempotente e testes reais de integração. Ainda não existe API, interface ou modelo de Machine Learning.
 
 ## Propósito
 
@@ -28,18 +28,21 @@ Consulte:
 - [`docs/dados/RELATORIO_EXPLORACAO.md`](docs/dados/RELATORIO_EXPLORACAO.md): resultados e limitações;
 - [`docs/pipeline/INGESTAO_RAW.md`](docs/pipeline/INGESTAO_RAW.md): operação e regras da ingestão raw;
 - [`docs/pipeline/TRANSFORMACAO_VALIDACAO.md`](docs/pipeline/TRANSFORMACAO_VALIDACAO.md): limpeza, validações e rejeições;
-- [`docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`](docs/dados/DICIONARIO_DADOS_PROCESSADOS.md): esquema da saída processada.
+- [`docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`](docs/dados/DICIONARIO_DADOS_PROCESSADOS.md): esquema da saída processada;
+- [`docs/database/MODELO_RELACIONAL.md`](docs/database/MODELO_RELACIONAL.md): tabelas, chaves e relacionamentos;
+- [`docs/database/POSTGRESQL_LOCAL.md`](docs/database/POSTGRESQL_LOCAL.md): configuração, carga e testes do banco local.
 
 ## Pré-requisitos atuais
 
-Para executar as ferramentas atuais, basta ter:
+Para executar o projeto até o Módulo 4, é necessário ter:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
 - Python 3.9 ou compatível;
+- PostgreSQL 17 com `psql`, `createdb` e `createuser`;
 - um terminal para executar os comandos documentados.
 
-O script utiliza somente a biblioteca padrão do Python. Pandas não é necessário neste módulo.
+O código Python continua utilizando somente a biblioteca padrão. Não foi adicionado driver Python de PostgreSQL porque a carga deste módulo utiliza o cliente oficial `psql`.
 
 ## Como executar
 
@@ -49,23 +52,30 @@ Na raiz do projeto, execute:
 python3 exploration/explore_sample.py
 python3 -m pipeline.ingest_raw data/samples/precos-combustiveis-amostra.csv
 python3 -m pipeline.transform_data data/raw/precos-combustiveis-amostra__d5dd2159be5b.csv
+database/scripts/create_schema.sh
+database/scripts/load_processed.sh \
+  data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
+database/scripts/run_initial_queries.sh
 python3 -m unittest discover -s tests -v
+FUELVISION_RUN_DB_TESTS=1 python3 -m unittest discover -s tests -v
 ```
 
-O primeiro comando apresenta o perfil da amostra. O segundo preserva a entrada raw. O terceiro gera dados processados, rejeitados e manifesto. O quarto executa todos os testes.
+Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. O último comando ativa os testes que exigem PostgreSQL em execução.
 
-Leia os documentos técnicos do Módulo 3 nesta ordem:
+Leia os documentos técnicos nesta ordem:
 
 1. `docs/pipeline/INGESTAO_RAW.md`;
 2. `docs/pipeline/TRANSFORMACAO_VALIDACAO.md`;
-3. `docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`.
+3. `docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`;
+4. `docs/database/MODELO_RELACIONAL.md`;
+5. `docs/database/POSTGRESQL_LOCAL.md`.
 
 ## Limitações atuais
 
 - somente uma amostra não representativa foi versionada;
-- o processamento foi validado somente sobre uma amostra pequena;
-- as regras de padronização ainda não usam banco ou catálogo externo;
-- nenhum banco foi configurado;
+- a carga no banco foi validada somente sobre a amostra processada;
+- o modelo guarda o estado atual da revenda, não seu histórico de alterações;
+- ainda não há ferramenta de migração ou histórico de lotes carregados;
 - nenhuma API ou interface foi criada;
 - nenhum modelo de Machine Learning foi desenvolvido;
 - não existem conclusões estatísticas ou métricas de negócio.
