@@ -21,9 +21,10 @@ LOAD_SCRIPT_PATH = PROJECT_ROOT / "database" / "scripts" / "load_processed.sh"
 
 
 def read_local_environment() -> dict:
-    """Read simple KEY=VALUE assignments from the ignored local .env file."""
+    """Read simple KEY=VALUE assignments from the selected environment file."""
     values = {}
-    env_path = PROJECT_ROOT / ".env"
+    configured_path = os.environ.get("FUELVISION_ENV_FILE")
+    env_path = Path(configured_path) if configured_path else PROJECT_ROOT / ".env"
     for line in env_path.read_text(encoding="utf-8").splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
