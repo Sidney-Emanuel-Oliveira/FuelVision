@@ -1,0 +1,44 @@
+# Segredos e configurações locais
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Java
+target/
+*.class
+
+# Node.js e Front-end
+node_modules/
+dist/
+build/
+coverage/
+
+# Dados e modelos gerados futuramente
+data/raw/
+data/processed/
+*.pkl
+*.joblib
+
+# Editores e sistema operacional
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*~
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+tmp/
+temp/
