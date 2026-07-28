@@ -2,17 +2,17 @@
 
 import os
 import shutil
-import subprocess
-import tempfile
 import unittest
 from pathlib import Path
 
 from pipeline.schema import PROCESSED_COLUMNS
-from pipeline.transform_data import transform_file
+from postgres_test_support import (
+    PROJECT_ROOT,
+    create_processed_fixture,
+    run_project_command,
+)
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SAMPLE_PATH = PROJECT_ROOT / "data" / "samples" / "precos-combustiveis-amostra.csv"
 SCHEMA_PATH = PROJECT_ROOT / "database" / "sql" / "001_create_schema.sql"
 PREPARE_LOAD_PATH = PROJECT_ROOT / "database" / "sql" / "002_prepare_load.sql"
 FINISH_LOAD_PATH = PROJECT_ROOT / "database" / "sql" / "002_finish_load.sql"
@@ -126,11 +126,7 @@ class DatabaseIntegrationTest(unittest.TestCase):
             }
         )
 
-        cls.temporary_directory = tempfile.TemporaryDirectory()
-        processed_dir = Path(cls.temporary_directory.name) / "processed"
-        cls.processed_path = transform_file(SAMPLE_PATH, processed_dir)[
-            "processed_path"
-        ]
+        cls.temporary_directory, cls.processed_path = create_processed_fixture()
         cls._run_psql_file(SCHEMA_PATH)
         cls._run_loader()
 
@@ -140,13 +136,10 @@ class DatabaseIntegrationTest(unittest.TestCase):
 
     @classmethod
     def _run_command(cls, command, check=True):
-        return subprocess.run(
+        return run_project_command(
             command,
-            cwd=PROJECT_ROOT,
-            env=cls.database_environment,
-            capture_output=True,
-            text=True,
             check=check,
+            environment=cls.database_environment,
         )
 
     @classmethod

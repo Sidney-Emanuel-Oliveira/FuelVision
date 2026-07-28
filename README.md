@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 4 — PostgreSQL e Modelagem de Dados** adicionou armazenamento relacional para os dados processados. O banco possui tabelas conectadas, restrições de qualidade, carga idempotente e testes reais de integração. Ainda não existe API, interface ou modelo de Machine Learning.
+O **Módulo 5 — Análises e Consultas SQL** adicionou indicadores descritivos por produto, estado, município e data. As consultas calculam quantidade, média, mínimo, máximo e amplitude, aceitam filtros e validam os resultados contra as observações armazenadas. Ainda não existe API, interface ou modelo de Machine Learning.
 
 ## Propósito
 
@@ -30,7 +30,8 @@ Consulte:
 - [`docs/pipeline/TRANSFORMACAO_VALIDACAO.md`](docs/pipeline/TRANSFORMACAO_VALIDACAO.md): limpeza, validações e rejeições;
 - [`docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`](docs/dados/DICIONARIO_DADOS_PROCESSADOS.md): esquema da saída processada;
 - [`docs/database/MODELO_RELACIONAL.md`](docs/database/MODELO_RELACIONAL.md): tabelas, chaves e relacionamentos;
-- [`docs/database/POSTGRESQL_LOCAL.md`](docs/database/POSTGRESQL_LOCAL.md): configuração, carga e testes do banco local.
+- [`docs/database/POSTGRESQL_LOCAL.md`](docs/database/POSTGRESQL_LOCAL.md): configuração, carga e testes do banco local;
+- [`docs/database/ANALISES_SQL.md`](docs/database/ANALISES_SQL.md): indicadores, filtros, resultados e limitações analíticas.
 
 ## Pré-requisitos atuais
 
@@ -56,6 +57,9 @@ database/scripts/create_schema.sh
 database/scripts/load_processed.sh \
   data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
 database/scripts/run_initial_queries.sh
+database/scripts/create_analytics_views.sh
+database/scripts/validate_analytics.sh
+database/scripts/run_analytics.sh
 python3 -m unittest discover -s tests -v
 FUELVISION_RUN_DB_TESTS=1 python3 -m unittest discover -s tests -v
 ```
@@ -68,12 +72,16 @@ Leia os documentos técnicos nesta ordem:
 2. `docs/pipeline/TRANSFORMACAO_VALIDACAO.md`;
 3. `docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`;
 4. `docs/database/MODELO_RELACIONAL.md`;
-5. `docs/database/POSTGRESQL_LOCAL.md`.
+5. `docs/database/POSTGRESQL_LOCAL.md`;
+6. `docs/database/ANALISES_SQL.md`.
 
 ## Limitações atuais
 
 - somente uma amostra não representativa foi versionada;
 - a carga no banco foi validada somente sobre a amostra processada;
+- as análises descrevem somente 60 observações controladas e não representam o mercado brasileiro;
+- muitos grupos por localidade possuem apenas uma ou duas observações;
+- a evolução diária não acompanha o mesmo conjunto de revendas em todas as datas;
 - o modelo guarda o estado atual da revenda, não seu histórico de alterações;
 - ainda não há ferramenta de migração ou histórico de lotes carregados;
 - nenhuma API ou interface foi criada;

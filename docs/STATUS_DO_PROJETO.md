@@ -9,7 +9,7 @@ Atualizado em: 28/07/2026.
 | 2      | Ingestão da Camada Raw                  | Concluído    | 28/07/2026 | Pipeline raw idempotente, validações, integridade, logs e 11 testes              |
 | 3      | Limpeza, Transformação e Validação      | Concluído    | 28/07/2026 | Padronização, validações, processados, rejeitados e 14 testes                    |
 | 4      | PostgreSQL e Modelagem de Dados         | Concluído    | 28/07/2026 | PostgreSQL 17, seis tabelas, carga idempotente e 13 testes                       |
-| 5      | Análises e Consultas SQL                | Não iniciado | —          | —                                                                                |
+| 5      | Análises e Consultas SQL                | Concluído    | 28/07/2026 | Quatro views, indicadores, cinco filtros, validações e 10 testes                 |
 | 6      | API Back-end com Java e Spring Boot     | Não iniciado | —          | —                                                                                |
 | 7      | Dashboard React e TypeScript            | Não iniciado | —          | —                                                                                |
 | 8      | Machine Learning: Baseline              | Não iniciado | —          | —                                                                                |
@@ -20,4 +20,4 @@ Atualizado em: 28/07/2026.
 
 ## Observação
 
-Os Módulos 0, 1, 2, 3 e 4 estão concluídos. Os demais módulos aguardam autorização.
+Os Módulos 0, 1, 2, 3, 4 e 5 estão concluídos. Os demais módulos aguardam autorização.
