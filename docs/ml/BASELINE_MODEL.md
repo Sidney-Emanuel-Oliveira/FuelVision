@@ -314,8 +314,9 @@ específicos. Isso ajuda a impedir que problemas numéricos sejam ignorados.
 - não houve validação cruzada temporal nem ajuste de hiperparâmetros;
 - o resultado não sustenta conclusão estatística ou decisão de negócio;
 - GNV não está coberto;
-- não existe persistência, versionamento, API de previsão, dashboard preditivo,
-  detecção de anomalias ou monitoramento do modelo.
+- persistência, versionamento, API e dashboard foram acrescentados no Módulo 9,
+  conforme `docs/ml/MODEL_SERVING.md`; ainda não existe detecção de anomalias ou
+  monitoramento do modelo.
 
 ## O que precisa ser compreendido agora
 
@@ -335,7 +336,7 @@ específicos. Isso ajuda a impedir que problemas numéricos sejam ignorados.
 - busca de hiperparâmetros;
 - intervalos de confiança e testes estatísticos;
 - algoritmos não lineares;
-- persistência, versionamento, inferência e monitoramento.
+- atualização automática, detecção de drift e monitoramento operacional.
 
 Esses assuntos não são necessários para compreender o baseline atual e não foram
 implementados antecipadamente.

@@ -27,6 +27,7 @@ coverage/
 # Dados e modelos gerados futuramente
 data/raw/
 data/processed/
+ml/artifacts/
 *.pkl
 *.joblib
 

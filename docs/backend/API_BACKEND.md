@@ -4,7 +4,7 @@
 
 O Módulo 6 criou uma API REST somente para leitura, desenvolvida com Java e Spring Boot. Ela consulta as observações e os indicadores que já existem no PostgreSQL e devolve respostas JSON.
 
-Foram disponibilizados somente cinco endpoints:
+O Módulo 6 disponibilizou cinco endpoints analíticos. O Módulo 9 acrescentou dois endpoints que integram o serviço Python de inferência:
 
 | Método | Caminho                         | Responsabilidade                                  |
 | ------ | ------------------------------- | ------------------------------------------------- |
@@ -13,6 +13,8 @@ Foram disponibilizados somente cinco endpoints:
 | GET    | `/api/prices/history`           | listar indicadores diários com paginação          |
 | GET    | `/api/locations/states`         | listar UFs que possuem preços na amostra           |
 | GET    | `/api/locations/cities?state=RJ`| listar municípios com preços em uma UF             |
+| GET    | `/api/predictions/model`        | consultar metadados do estimador ativo             |
+| POST   | `/api/predictions`              | solicitar uma estimativa para produto e data       |
 
 A API não altera o banco e não cria dados fictícios.
 
@@ -24,7 +26,7 @@ Até o Módulo 5, uma pessoa precisava executar SQL ou scripts no terminal para 
 cliente → requisição HTTP → API → PostgreSQL → DTO → JSON → cliente
 ```
 
-O dashboard do módulo seguinte poderá usar esse contrato. O Front-end ainda não foi criado.
+O dashboard consome esse contrato sem acessar diretamente o PostgreSQL nem o serviço Python.
 
 ## 3. Conceitos utilizados
 
@@ -101,6 +103,9 @@ Se `startDate=2026-01-08` e `endDate=2026-01-01`, o service lança `InvalidFilte
 | `config/OpenApiConfig.java`              | título, versão e descrição OpenAPI                              |
 | `controller/PriceController.java`        | três endpoints de preços                                        |
 | `controller/LocationController.java`     | dois endpoints de localidades                                   |
+| `controller/PredictionController.java`   | dois endpoints de metadados e estimativa                         |
+| `client/PredictionClient.java`           | comunicação HTTP com o serviço Python                            |
+| `service/PredictionService.java`         | normalização do produto antes da inferência                      |
 | `service/PriceQueryService.java`         | filtros, regra de datas e conversão dos resultados               |
 | `service/LocationService.java`           | normalização da UF e conversão das localidades                   |
 | `repository/PriceRepository.java`        | SQL de observações, resumo e histórico                           |
@@ -219,13 +224,14 @@ O segundo comando lê o `.env` local e ativa quatro testes de integração. Nenh
 
 ## 11. Resultados verificados
 
-- 14 testes Java aprovados com PostgreSQL ativado;
+- 22 testes Java aprovados com PostgreSQL ativado;
 - 60 observações encontradas pelo repository;
 - 14 grupos de data + produto no histórico completo;
 - cinco endpoints responderam `200`;
+- os dois endpoints de previsão responderam `200` na integração entre Python e Java;
 - `size=101` respondeu `400` com `ProblemDetail`;
 - filtro GNV + RJ + MACAE retornou 2 observações e média `4.935`;
-- OpenAPI 3.1 foi gerado com os cinco caminhos e esquemas de erro.
+- OpenAPI 3.1 foi gerado com os sete caminhos e esquemas de erro.
 
 Esses números descrevem apenas a amostra controlada já documentada. Não representam o mercado brasileiro.
 
@@ -280,7 +286,7 @@ Instale Maven 3.6.3 ou mais recente. O ambiente validado utiliza Maven 3.9.16.
 ## 14. Segurança e limitações
 
 - a API não possui autenticação nem autorização;
-- CORS ainda não foi configurado, pois nenhum Front-end existe;
+- CORS de produção ainda não foi configurado; no ambiente local, o Vite usa um proxy;
 - não há limitação por cliente ou proteção contra excesso de requisições;
 - Swagger está ativo no ambiente local e deverá ser revisto antes de produção;
 - não existe cache;
@@ -288,7 +294,30 @@ Instale Maven 3.6.3 ou mais recente. O ambiente validado utiliza Maven 3.9.16.
 - as consultas usam uma amostra de 60 registros;
 - não existe garantia de representatividade estatística;
 - não há deploy, container ou integração contínua;
-- não há Front-end ou Machine Learning.
+- o serviço de inferência precisa estar ativo para os dois endpoints preditivos;
+- indisponibilidade do serviço Python é convertida em `503`, sem expor detalhes internos;
+- as estimativas herdam todas as limitações do baseline documentadas em `docs/ml/MODEL_SERVING.md`.
+
+## Extensão do Módulo 9: cliente de inferência
+
+**Cliente HTTP** é o componente que chama outro serviço por HTTP. `PredictionClient` usa `RestClient`, define tempo limite de conexão de 2 segundos e leitura de 5 segundos e converte falhas externas em erros seguros.
+
+```text
+dashboard → PredictionController → PredictionService → PredictionClient
+          → FastAPI → artefato versionado → estimativa
+```
+
+Exemplos:
+
+```bash
+curl 'http://localhost:8080/api/predictions/model'
+
+curl -X POST 'http://localhost:8080/api/predictions' \
+  -H 'Content-Type: application/json' \
+  -d '{"product":"GASOLINA COMUM","collectionDate":"2026-01-03"}'
+```
+
+Um produto incompatível ou uma data fora da janela retorna `400`. Se o serviço Python estiver parado, o Back-end retorna `503`. Os testes de `PredictionController`, `PredictionService`, `PredictionClient` e do contexto Spring verificam essas fronteiras.
 
 ## 15. O que compreender agora
 

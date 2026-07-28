@@ -2,6 +2,9 @@ import type {
   CityLocation,
   LocationComparisonPoint,
   PageResponse,
+  PredictionEstimate,
+  PredictionModelInfo,
+  PredictionRequest,
   PriceFilters,
   PriceHistoryPoint,
   PriceSummary,
@@ -38,12 +41,17 @@ function buildQuery(parameters: Record<string, string | number | undefined>) {
   return serialized ? `?${serialized}` : "";
 }
 
-async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
+async function request<T>(
+  path: string,
+  signal?: AbortSignal,
+  options: RequestInit = {},
+): Promise<T> {
   let response: Response;
 
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
-      headers: { Accept: "application/json" },
+      ...options,
+      headers: { Accept: "application/json", ...options.headers },
       signal,
     });
   } catch (error) {
@@ -66,6 +74,21 @@ async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
   }
 
   return response.json() as Promise<T>;
+}
+
+export function getPredictionModel(signal?: AbortSignal) {
+  return request<PredictionModelInfo>("/api/predictions/model", signal);
+}
+
+export function requestPrediction(
+  prediction: PredictionRequest,
+  signal?: AbortSignal,
+) {
+  return request<PredictionEstimate>("/api/predictions", signal, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(prediction),
+  });
 }
 
 export function getSummaries(filters: FilterParameters, signal?: AbortSignal) {

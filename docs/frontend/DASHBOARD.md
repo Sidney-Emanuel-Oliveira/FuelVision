@@ -10,6 +10,7 @@ O Módulo 7 criou um dashboard Web responsivo que consulta a API do FuelVision e
 - filtros por combustível, estado, município e período;
 - mensagens específicas para carregamento, erro e consulta vazia;
 - tabelas alternativas com os valores utilizados nos gráficos.
+- painel de estimativa com produto, data, versão, MAE e limitações do estimador.
 
 O dashboard não cria observações nem possui uma base fictícia de reserva. Se a API estiver indisponível, a interface informa o erro.
 
@@ -20,6 +21,9 @@ Nos módulos anteriores, os indicadores já podiam ser consultados com SQL ou JS
 ```text
 usuário → filtros React → cliente HTTP → API Spring Boot → PostgreSQL
         ← componentes e gráficos ← JSON validado pelo contrato
+
+usuário → painel de estimativa → API Spring Boot → serviço Python → artefato
+        ← estimativa identificada por versão, período e MAE
 ```
 
 A interface não recalcula média, mínimo ou máximo. Esses valores continuam sob responsabilidade da API e do banco, evitando regras duplicadas em duas aplicações.
@@ -116,6 +120,7 @@ Esta decisão reutiliza o contrato existente e evita antecipar um endpoint do Ba
 | `frontend/src/components/PriceHistoryChart.tsx` | gráfico de linhas e tabela histórica |
 | `frontend/src/components/LocationComparisonChart.tsx` | gráfico de barras e tabela por UF |
 | `frontend/src/components/StatusPanel.tsx` | carregamento, erro, vazio e nova tentativa |
+| `frontend/src/components/PredictionPanel.tsx` | formulário, metadados e resultado da estimativa |
 | `frontend/src/utils/formatters.ts` | formatação de moeda, unidade e data em pt-BR |
 | `frontend/src/*.test.tsx` e `*.test.ts` | testes do fluxo da tela e do cliente HTTP |
 | `frontend/src/App.css` e `index.css` | identidade visual, foco, grades e media queries |
@@ -128,7 +133,7 @@ Esta decisão reutiliza o contrato existente e evita antecipar um endpoint do Ba
 - **Entrada:** produto, UF, município, datas e `AbortSignal` opcional;
 - **Processamento:** remove parâmetros vazios, codifica caracteres e verifica o status HTTP;
 - **Saída:** `Promise` com resumo, histórico ou localidade;
-- **Comunicação:** chama somente os cinco endpoints existentes;
+- **Comunicação:** chama os endpoints analíticos e os dois endpoints preditivos;
 - **Possíveis erros:** API parada, resposta `400`, banco indisponível ou requisição cancelada;
 - **Verificação:** `fuelVisionApi.test.ts` confere URLs, erro seguro e comparação.
 
@@ -236,7 +241,7 @@ npm run build
 - alternativa: biblioteca Axios;
 - vantagem: nenhuma dependência para uma necessidade pequena;
 - desvantagem: tratamento de erro e montagem de URL precisam ser implementados;
-- motivo: cinco endpoints somente de leitura não justificam uma abstração maior.
+- motivo: o contrato atual ainda é pequeno e não justifica uma abstração maior.
 
 ### Recharts em vez de SVG manual
 
@@ -298,7 +303,23 @@ Esses resultados descrevem a amostra local de 60 observações, não o mercado b
 - uma implantação em origens diferentes exigirá CORS explícito;
 - não houve auditoria completa com tecnologia assistiva;
 - Recharts aumenta o pacote JavaScript inicial;
-- não há Machine Learning, previsão, anomalia, Docker, CI ou deploy.
+- a previsão é uma estimativa simples, limitada aos produtos e às datas informados pelo modelo;
+- uma falha preditiva não remove os indicadores analíticos já carregados;
+- não há intervalo de incerteza, anomalia, Docker, CI ou deploy.
+
+## Extensão do Módulo 9: painel de estimativa
+
+O `PredictionPanel` consulta os metadados do estimador ao iniciar, restringe o formulário aos produtos e datas suportados e envia a solicitação somente após a ação do usuário. Ele não apresenta o número como certeza: o resultado inclui **estimativa**, unidade, versão, data final do treino, MAE e aviso de limitação.
+
+```text
+metadados do modelo
+→ opções e limites do formulário
+→ produto + data
+→ POST /api/predictions
+→ estimativa ou erro isolado no painel
+```
+
+Os testes verificam a seleção do produto atual, o corpo enviado, a apresentação da estimativa, os limites de data e a indisponibilidade do serviço. A suíte do Front-end possui 16 testes após essa extensão.
 
 ## 13. O que compreender agora
 

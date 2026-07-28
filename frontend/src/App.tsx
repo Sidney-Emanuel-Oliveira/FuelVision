@@ -9,6 +9,7 @@ import {
 } from "./api/fuelVisionApi";
 import { DashboardFilters } from "./components/DashboardFilters";
 import { MetricCard } from "./components/MetricCard";
+import { PredictionPanel } from "./components/PredictionPanel";
 import { StatusPanel } from "./components/StatusPanel";
 import type {
   CityLocation,
@@ -325,6 +326,8 @@ export default function App() {
                     accent="coral"
                   />
                 </div>
+
+                <PredictionPanel selectedProduct={summary.product} />
 
                 <Suspense
                   fallback={

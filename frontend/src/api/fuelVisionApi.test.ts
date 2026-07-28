@@ -2,8 +2,10 @@ import {
   ApiError,
   getCities,
   getHistory,
+  getPredictionModel,
   getStateComparison,
   getSummaries,
+  requestPrediction,
 } from "./fuelVisionApi";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -91,5 +93,39 @@ describe("fuelVisionApi", () => {
         observationCount: 8,
       },
     ]);
+  });
+
+  it("envia a previsão como JSON e consulta os metadados do modelo", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(jsonResponse({ modelVersion: "baseline-v1" }))
+      .mockResolvedValueOnce(jsonResponse({ estimatedPrice: 6.077 }));
+
+    await getPredictionModel();
+    await requestPrediction({
+      product: "GASOLINA COMUM",
+      collectionDate: "2026-01-03",
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "/api/predictions/model",
+      expect.objectContaining({ headers: { Accept: "application/json" } }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/predictions",
+      expect.objectContaining({
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          product: "GASOLINA COMUM",
+          collectionDate: "2026-01-03",
+        }),
+      }),
+    );
   });
 });

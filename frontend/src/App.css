@@ -337,6 +337,103 @@ main {
   color: var(--muted);
   font-size: 0.79rem;
 }
+.prediction-panel {
+  margin-top: 1rem;
+  padding: 1.45rem;
+  background: linear-gradient(135deg, #f4faf7 0%, #eef7f5 100%);
+  border: 1px solid #c9e2dc;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(7, 59, 76, 0.055);
+}
+.prediction-panel__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.prediction-panel h2 {
+  margin: 0.3rem 0 0;
+  color: var(--deep);
+  font-size: 1.35rem;
+}
+.prediction-panel__version {
+  padding: 0.45rem 0.7rem;
+  color: var(--deep);
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.prediction-panel__intro,
+.prediction-panel__metadata {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.prediction-panel__intro {
+  max-width: 760px;
+  margin: 0.9rem 0 0;
+}
+.prediction-form {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 0.8fr) auto;
+  align-items: end;
+  gap: 0.8rem;
+}
+.prediction-form label {
+  display: grid;
+  gap: 0.45rem;
+  color: #50615e;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.prediction-form select,
+.prediction-form input {
+  min-height: 45px;
+  padding: 0.7rem 0.75rem;
+  color: var(--ink);
+  background: white;
+  border: 1px solid #c8d8d4;
+  border-radius: 10px;
+}
+.prediction-panel__metadata {
+  margin: 0.85rem 0 0;
+  font-size: 0.78rem;
+}
+.prediction-panel__error {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  color: #8c3029;
+  background: #fce9e6;
+  border-radius: 10px;
+}
+.prediction-result {
+  margin-top: 1rem;
+  padding: 1.1rem;
+  background: white;
+  border-left: 5px solid var(--amber);
+  border-radius: 12px;
+}
+.prediction-result span,
+.prediction-result strong,
+.prediction-result small {
+  display: block;
+}
+.prediction-result span,
+.prediction-result small {
+  color: var(--muted);
+}
+.prediction-result strong {
+  margin-top: 0.35rem;
+  color: var(--deep);
+  font-size: 2rem;
+}
+.prediction-result p {
+  margin: 0.65rem 0;
+  color: #7d4c00;
+  font-size: 0.85rem;
+}
 .chart-card {
   margin-top: 1rem;
   padding: 1.45rem;
@@ -441,8 +538,12 @@ footer p {
     flex-direction: column;
   }
   .filters__grid,
-  .metrics-grid {
+  .metrics-grid,
+  .prediction-form {
     grid-template-columns: 1fr;
+  }
+  .prediction-panel__heading {
+    flex-direction: column;
   }
   .dashboard,
   .status-panel,

@@ -11,6 +11,11 @@ vi.mock("./components/PriceHistoryChart", () => ({
 vi.mock("./components/LocationComparisonChart", () => ({
   LocationComparisonChart: () => <div>Comparação entre estados</div>,
 }));
+vi.mock("./components/PredictionPanel", () => ({
+  PredictionPanel: ({ selectedProduct }: { selectedProduct: string }) => (
+    <div>Estimativa para {selectedProduct}</div>
+  ),
+}));
 
 const summary = {
   product: "GNV",

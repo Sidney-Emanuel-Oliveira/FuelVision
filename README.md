@@ -2,7 +2,7 @@
 
 O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
 
-O **Módulo 8 — Machine Learning: Baseline** adicionou o primeiro experimento de regressão com separação temporal, baseline por média de produto, regressão Ridge e métricas MAE e RMSE. O experimento demonstrou que o Ridge ainda não supera a referência simples nesta amostra e, por isso, não é apresentado como um modelo pronto para uso.
+O **Módulo 9 — Previsão Disponível pela Aplicação** tornou o baseline por média de produto acessível no dashboard. O estimador aprovado no Módulo 8 agora é persistido com metadados, carregado por uma API FastAPI, intermediado pelo Back-end Spring Boot e apresentado como **estimativa**, com versão, período de treino, MAE e aviso de limitação.
 
 ## Propósito
 
@@ -35,10 +35,11 @@ Consulte:
 - [`docs/backend/API_BACKEND.md`](docs/backend/API_BACKEND.md): arquitetura, endpoints, execução, testes e limites da API.
 - [`docs/frontend/DASHBOARD.md`](docs/frontend/DASHBOARD.md): componentes, integração, filtros, gráficos, execução e testes do dashboard.
 - [`docs/ml/BASELINE_MODEL.md`](docs/ml/BASELINE_MODEL.md): problema preditivo, preparação temporal, baseline, Ridge, métricas e limitações.
+- [`docs/ml/MODEL_SERVING.md`](docs/ml/MODEL_SERVING.md): seleção, persistência, inferência, versionamento e integração da estimativa.
 
 ## Pré-requisitos atuais
 
-Para executar o projeto até o Módulo 8, é necessário ter:
+Para executar o projeto até o Módulo 9, é necessário ter:
 
 - um editor de texto;
 - Git para consultar o estado do repositório;
@@ -49,7 +50,7 @@ Para executar o projeto até o Módulo 8, é necessário ter:
 - Node.js compatível com Vite 8 e npm;
 - um terminal para executar os comandos documentados.
 
-O experimento de Machine Learning requer um ambiente virtual com pandas 2.3.3 e scikit-learn 1.6.1. As versões estão fixadas em `ml/requirements.txt`. Não foi adicionado driver Python de PostgreSQL porque a carga continua utilizando o cliente oficial `psql`.
+O serviço de estimativas requer um ambiente virtual com as versões de pandas, scikit-learn, joblib, FastAPI e Uvicorn fixadas em `ml/requirements.txt`. Não foi adicionado driver Python de PostgreSQL porque a carga continua utilizando o cliente oficial `psql`.
 
 ## Como executar
 
@@ -73,6 +74,9 @@ python3 -m venv .venv
 FUELVISION_RUN_DB_TESTS=1 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python -m ml.train_evaluate \
   --input data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
+.venv/bin/python -m ml.artifact \
+  --input data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
+.venv/bin/python -m uvicorn ml.inference_api:app --host 127.0.0.1 --port 8000 --ws none
 backend/scripts/test.sh
 backend/scripts/test.sh --with-postgres
 backend/scripts/run.sh
@@ -86,7 +90,7 @@ npm run build
 npm run dev
 ```
 
-Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. Os comandos com `FUELVISION_RUN_DB_TESTS=1` e `--with-postgres` ativam os testes que exigem PostgreSQL. Execute `backend/scripts/run.sh` e `npm run dev` em terminais separados quando quiser usar o dashboard.
+Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. Os comandos com `FUELVISION_RUN_DB_TESTS=1` e `--with-postgres` ativam os testes que exigem PostgreSQL. Para usar todo o dashboard, mantenha o serviço Python, `backend/scripts/run.sh` e `npm run dev` em três terminais separados. O artefato em `ml/artifacts/` é gerado localmente e não é versionado.
 
 Leia os documentos técnicos nesta ordem:
 
@@ -99,6 +103,7 @@ Leia os documentos técnicos nesta ordem:
 7. `docs/backend/API_BACKEND.md`.
 8. `docs/frontend/DASHBOARD.md`.
 9. `docs/ml/BASELINE_MODEL.md`.
+10. `docs/ml/MODEL_SERVING.md`.
 
 ## Limitações atuais
 
@@ -116,7 +121,10 @@ Leia os documentos técnicos nesta ordem:
 - o primeiro Ridge não superou o baseline por média de produto no teste temporal;
 - o experimento usa apenas 50 observações líquidas, com uma data de treino e uma de teste;
 - GNV não participa do baseline porque utiliza `BRL/m3`;
-- o modelo existe somente em memória durante o experimento e não está disponível na API ou no dashboard;
+- a estimativa usa o baseline simples por produto, não o Ridge, e só aceita datas entre 03/01/2026 e 01/02/2026;
+- o artefato é gerado a partir de apenas 50 observações líquidas e precisa ser criado localmente antes de iniciar o serviço;
+- o serviço de inferência não possui autenticação, monitoramento, implantação produtiva ou atualização automática;
+- a estimativa é pontual e não possui intervalo de incerteza;
 - não existem conclusões estatísticas ou métricas de negócio.
 
 Essas limitações são intencionais e preservam a progressão definida no plano.

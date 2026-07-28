@@ -54,3 +54,37 @@ export interface LocationComparisonPoint {
   averageSalePrice: number;
   observationCount: number;
 }
+
+export interface PredictionModelInfo {
+  modelVersion: string;
+  modelType: string;
+  unit: string;
+  supportedProducts: string[];
+  trainingRows: number;
+  trainingStart: string;
+  trainingEnd: string;
+  predictionStart: string;
+  predictionEnd: string;
+  evaluationMae: number;
+  ridgeEvaluationMae: number;
+  ridgeBeatsBaseline: boolean;
+  selectionReason: string;
+  warning: string;
+}
+
+export interface PredictionRequest {
+  product: string;
+  collectionDate: string;
+}
+
+export interface PredictionEstimate {
+  product: string;
+  collectionDate: string;
+  estimatedPrice: number;
+  unit: string;
+  modelVersion: string;
+  modelType: string;
+  trainedThrough: string;
+  evaluationMae: number;
+  warning: string;
+}
