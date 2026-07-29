@@ -1,4 +1,4 @@
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -23,7 +23,7 @@ RUN python -m pipeline.transform_data \
         --input /generated/precos-combustiveis-amostra__v1__processed.csv \
         --output /generated/fuel-price-baseline-v1.joblib
 
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 ENV PYTHONUNBUFFERED=1 \
     FUELVISION_MODEL_PATH=/app/ml/artifacts/fuel-price-baseline-v1.joblib \
