@@ -6,7 +6,7 @@ COPY backend/pom.xml ./backend/pom.xml
 COPY backend/src ./backend/src
 RUN mvn -f backend/pom.xml package -DskipTests
 
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 WORKDIR /app
 
