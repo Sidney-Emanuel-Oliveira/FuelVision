@@ -8,7 +8,7 @@ RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-FROM nginxinc/nginx-unprivileged:1.28.2-alpine
+FROM nginxinc/nginx-unprivileged:1.31.3-alpine
 
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
