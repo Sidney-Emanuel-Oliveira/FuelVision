@@ -10,7 +10,7 @@ RUN python -m pipeline.transform_data \
         --output-dir /generated \
         --log-file /tmp/transformation.log
 
-FROM postgres:17-alpine
+FROM postgres:18-alpine
 
 COPY database/sql /opt/fuelvision/sql
 COPY database/docker/init-fuelvision.sh /docker-entrypoint-initdb.d/10-init-fuelvision.sh
