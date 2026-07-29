@@ -1,5 +1,5 @@
 click==8.3.3
-fastapi==0.139.2
+fastapi==0.140.13
 joblib==1.5.3
 numpy==2.0.2
 pandas==2.3.3
