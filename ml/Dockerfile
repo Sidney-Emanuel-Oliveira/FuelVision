@@ -1,4 +1,4 @@
-FROM python:3.9-slim AS builder
+FROM python:3.11-slim AS builder
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -8,6 +8,7 @@ WORKDIR /app
 
 COPY ml/requirements.txt ./ml/requirements.txt
 RUN python -m venv /opt/venv \
+    && python -m pip install --upgrade pip==26.1.2 setuptools==83.0.0 \
     && python -m pip install -r ml/requirements.txt
 
 COPY pipeline ./pipeline
@@ -22,7 +23,7 @@ RUN python -m pipeline.transform_data \
         --input /generated/precos-combustiveis-amostra__v1__processed.csv \
         --output /generated/fuel-price-baseline-v1.joblib
 
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1 \
     FUELVISION_MODEL_PATH=/app/ml/artifacts/fuel-price-baseline-v1.joblib \
@@ -36,7 +37,12 @@ COPY --from=builder \
     /generated/fuel-price-baseline-v1.joblib \
     /app/ml/artifacts/fuel-price-baseline-v1.joblib
 
-RUN useradd --create-home --uid 10001 fuelvision \
+RUN /usr/local/bin/python -m pip install \
+        --no-cache-dir \
+        --upgrade \
+        pip==26.1.2 \
+        setuptools==83.0.0 \
+    && useradd --create-home --uid 10001 fuelvision \
     && chown -R fuelvision:fuelvision /app
 
 USER fuelvision

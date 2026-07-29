@@ -101,7 +101,7 @@ export function AnomalyPanel({ filters }: AnomalyPanelProps) {
               </div>
               <p>
                 {anomaly.retailer} · {anomaly.municipality} —{" "}
-                {anomaly.stateCode}· {formatDate(anomaly.collectionDate)}
+                {anomaly.stateCode} · {formatDate(anomaly.collectionDate)}
               </p>
               <dl className="anomaly-card__limits">
                 <div>

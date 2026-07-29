@@ -306,13 +306,15 @@ Esses resultados descrevem a amostra local de 60 observações, não o mercado b
 - o histórico solicita no máximo 100 pontos, limite atual da API;
 - não existe autenticação, cache ou limite por cliente;
 - uma implantação em origens diferentes exigirá CORS explícito;
-- não houve auditoria completa com tecnologia assistiva;
+- a auditoria Lighthouse atingiu 100/100 em acessibilidade, mas ainda não houve
+  avaliação humana com leitor de tela ou outras tecnologias assistivas;
 - Recharts aumenta o pacote JavaScript inicial;
 - a previsão é uma estimativa simples, limitada aos produtos e às datas informados pelo modelo;
 - uma falha preditiva não remove os indicadores analíticos já carregados;
 - os alertas IQR podem representar diferenças regionais legítimas;
 - uma anomalia não comprova fraude, erro ou irregularidade;
-- não há intervalo de incerteza, Docker, CI ou deploy.
+- não há intervalo de incerteza; Docker, CI e preparação de deploy foram
+  acrescentados nos Módulos 11 e 12.
 
 ## Extensão do Módulo 9: painel de estimativa
 

@@ -377,7 +377,8 @@ npm run build
 - não existe retreinamento automático, registro remoto ou rollback;
 - a detecção estatística de anomalias foi implementada separadamente no Módulo
   10 e está documentada em `docs/analytics/ANOMALY_DETECTION.md`;
-- não há Docker, CI ou deploy.
+- Docker, CI e preparação de deploy estão disponíveis, mas não existe
+  monitoramento do modelo, retreinamento automático ou instância pública mantida.
 
 ## O que precisa ser compreendido agora
 

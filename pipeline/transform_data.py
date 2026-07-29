@@ -130,7 +130,9 @@ def is_valid_cnpj(value: str) -> bool:
         return False
 
     def calculate_digit(base: str, weights: Tuple[int, ...]) -> str:
-        total = sum(int(digit) * weight for digit, weight in zip(base, weights))
+        total = sum(
+            int(digit) * weight for digit, weight in zip(base, weights, strict=True)
+        )
         remainder = total % 11
         return "0" if remainder < 2 else str(11 - remainder)
 

@@ -349,7 +349,8 @@ brasileiro e não permitem concluir que os preços ou revendas estejam errados.
 - não há histórico suficiente para detectar mudança temporal por revenda;
 - o método não explica a causa do alerta;
 - não existe validação humana registrada, feedback ou monitoramento;
-- não há Docker, CI ou deploy.
+- Docker e CI estão disponíveis, mas não há validação humana registrada,
+  monitoramento contínuo nem uma instância pública mantida pelo projeto.
 
 ## O que precisa ser compreendido agora
 

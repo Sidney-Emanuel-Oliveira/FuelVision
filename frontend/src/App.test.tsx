@@ -71,6 +71,18 @@ describe("App", () => {
     ]);
   });
 
+  it("oferece atalho de teclado para o conteúdo principal", () => {
+    render(<App />);
+
+    expect(
+      screen.getByRole("link", { name: "Pular para o conteúdo principal" }),
+    ).toHaveAttribute("href", "#main-content");
+    expect(document.querySelector("main#main-content")).toHaveAttribute(
+      "tabindex",
+      "-1",
+    );
+  });
+
   it("apresenta carregamento e depois os indicadores reais da API", async () => {
     render(<App />);
 

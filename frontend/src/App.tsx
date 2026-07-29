@@ -186,24 +186,21 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        Pular para o conteúdo principal
+      </a>
       <header className="topbar">
-        <a
-          className="brand"
-          href="#main-content"
-          aria-label="FuelVision — ir ao conteúdo"
-        >
-          <span className="brand__mark" aria-hidden="true">
-            FV
-          </span>
+        <a className="brand" href="/" title="Página inicial">
+          <span className="brand__mark">FV</span>
           <span>
             <strong>FuelVision</strong>
             <small>Inteligência sobre combustíveis</small>
           </span>
         </a>
-        <span className="data-badge">Dados públicos · ANP</span>
+        <span className="data-badge">Amostra pública · ANP</span>
       </header>
 
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <section className="hero">
           <div>
             <span className="eyebrow eyebrow--light">Painel analítico</span>

@@ -5,9 +5,9 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --ink: #17312f;
-  --muted: #667673;
+  --muted: #52635f;
   --deep: #073b4c;
-  --mint: #0b806f;
+  --mint: #075f54;
   --mint-light: #d7f0e9;
   --amber: #e19a22;
   --coral: #d96459;
@@ -26,6 +26,20 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+}
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.7rem 1rem;
+  color: white;
+  background: var(--deep);
+  border-radius: 8px;
+  transform: translateY(-160%);
+}
+.skip-link:focus {
+  transform: translateY(0);
 }
 button,
 input,

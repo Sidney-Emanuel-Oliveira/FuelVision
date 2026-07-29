@@ -166,7 +166,7 @@ linhas. Como existem apenas duas datas elegíveis, uma fica em cada conjunto.
 | `ml/train_evaluate.py` | coordenar baseline, Ridge, comparação e CLI |
 | `ml/requirements.txt` | fixar dependências de execução |
 | `ml/requirements-dev.txt` | adicionar ferramenta de qualidade |
-| `ml/pyproject.toml` | configurar Ruff e compatibilidade com Python 3.9 |
+| `ml/pyproject.toml` | configurar Ruff e compatibilidade com Python 3.11 |
 | `tests/test_ml_baseline.py` | verificar dados, split, baseline, métricas e fluxo |
 
 ## Código por blocos

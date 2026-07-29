@@ -90,11 +90,11 @@ export function PriceHistoryChart({ data }: PriceHistoryChartProps) {
           <table>
             <thead>
               <tr>
-                <th>Data</th>
-                <th>Médio</th>
-                <th>Mínimo</th>
-                <th>Máximo</th>
-                <th>Observações</th>
+                <th scope="col">Data</th>
+                <th scope="col">Médio</th>
+                <th scope="col">Mínimo</th>
+                <th scope="col">Máximo</th>
+                <th scope="col">Observações</th>
               </tr>
             </thead>
             <tbody>

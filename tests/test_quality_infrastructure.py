@@ -64,10 +64,10 @@ class QualityInfrastructureContractTest(unittest.TestCase):
             "unittest discover",
             "backend/scripts/test.sh --with-postgres",
             "npm --prefix frontend test",
-            "docker compose build",
-            "docker compose up --detach --wait",
-            "localhost:5173/api/prices/summary",
-            "docker compose down --volumes",
+            "compose.production.yaml build",
+            "compose.production.yaml up --detach --wait",
+            "deploy_smoke.sh http://localhost:8088",
+            "compose.production.yaml down --volumes",
         )
         for command in required_commands:
             self.assertIn(command, workflow)
@@ -78,6 +78,7 @@ class QualityInfrastructureContractTest(unittest.TestCase):
         )
 
         for command in (
+            "sys.version_info < (3, 11)",
             "ruff check",
             "--config ml/pyproject.toml",
             "ruff format --check",

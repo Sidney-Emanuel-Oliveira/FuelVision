@@ -78,9 +78,9 @@ export function LocationComparisonChart({
           <table>
             <thead>
               <tr>
-                <th>Estado</th>
-                <th>Preço médio</th>
-                <th>Observações</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Preço médio</th>
+                <th scope="col">Observações</th>
               </tr>
             </thead>
             <tbody>

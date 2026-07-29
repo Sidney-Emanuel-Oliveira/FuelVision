@@ -35,7 +35,7 @@ comandos visíveis e repetíveis.
 
 **Imagem Docker** é um pacote imutável que contém aplicação, runtime e arquivos
 necessários para iniciar um serviço. No FuelVision, a imagem `prediction`
-contém Python 3.9, dependências fixadas e o artefato treinado com a amostra.
+contém Python 3.11, dependências fixadas e o artefato treinado com a amostra.
 Ela é importante porque define o que será executado, sem depender do Python
 global do computador.
 
@@ -289,7 +289,7 @@ Ordem resumida:
 
 ```text
 checkout
-→ Python 3.9 + Ruff
+→ Python 3.11 + Ruff
 → Java 21 + Maven
 → Node 24 + npm ci
 → PostgreSQL em contêiner
@@ -363,3 +363,14 @@ banco efêmero da CI. Elas não concedem acesso a um ambiente externo.
 
 Esses assuntos são importantes, mas pertencem a uma etapa posterior. Kubernetes
 não foi adicionado porque não resolve uma necessidade atual do FuelVision.
+
+## 15. Extensão profissional do Módulo 12
+
+O Módulo 12 preservou os quatro serviços e acrescentou, somente na configuração
+de publicação, um gateway Caddy. O Front-end passou a executar com Nginx não
+privilegiado na porta interna 8080. A CI também valida a combinação
+`compose.yaml + compose.production.yaml`, os cabeçalhos de segurança e o smoke
+test pelo gateway.
+
+Consulte `docs/DEPLOY.md` para entender domínio, HTTPS, segredos, backup e os
+limites de uma instalação em servidor único.

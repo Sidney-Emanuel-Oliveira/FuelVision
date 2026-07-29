@@ -64,7 +64,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "127.0.0.1:${FUELVISION_FRONTEND_PORT:-5173}:80"
+      - "127.0.0.1:${FUELVISION_FRONTEND_PORT:-5173}:8080"
 
 volumes:
   fuelvision_postgres_data:

@@ -1,175 +1,185 @@
 # FuelVision
 
-O FuelVision é um projeto educacional e profissional que evoluirá para uma plataforma de análise de preços de combustíveis baseada em dados públicos brasileiros.
+[![Qualidade](https://github.com/Sidney-Emanuel-Oliveira/FuelVision/actions/workflows/quality.yml/badge.svg)](https://github.com/Sidney-Emanuel-Oliveira/FuelVision/actions/workflows/quality.yml)
 
-O **Módulo 11 — Qualidade, Docker e Integração Contínua** tornou os quatro serviços reproduzíveis com Docker Compose, health checks, lint, testes, builds e GitHub Actions. O ambiente completo sobe com a amostra controlada, usuário PostgreSQL restrito e o Nginx encaminhando o dashboard para a API.
+Plataforma full stack de Engenharia de Dados, Analytics e Machine Learning para
+estudar preços de combustíveis com uma amostra pública controlada da ANP.
 
-## Propósito
+![Dashboard do FuelVision](docs/assets/fuelvision-dashboard.png)
 
-O projeto pretende reunir, de forma gradual:
+> [!IMPORTANT]
+> Os 60 registros versionados não representam o mercado brasileiro. A previsão
+> é um baseline experimental e um alerta estatístico não significa fraude.
 
-- Engenharia de Dados para obtenção, validação e preparação dos dados;
-- Analytics para produzir consultas e indicadores;
-- uma API para disponibilizar informações;
-- uma interface para apresentar resultados;
-- Machine Learning para experimentos de previsão e métodos estatísticos para detectar comportamentos atípicos.
+## O que funciona
 
-Cada capacidade será construída somente no módulo correspondente. A ordem oficial está em [`docs/PLANO_FUELVISION.md`](docs/PLANO_FUELVISION.md).
+- ingestão raw imutável e identificada por hash;
+- limpeza, padronização, validação e registros rejeitados;
+- carga idempotente em seis tabelas PostgreSQL;
+- consultas de média, mínimo, máximo, histórico e localidades;
+- API Java/Spring Boot documentada com OpenAPI;
+- dashboard React/TypeScript responsivo com filtros e tabelas acessíveis;
+- estimativa experimental servida por FastAPI;
+- detecção de comportamentos atípicos pelo intervalo interquartil;
+- quatro imagens Docker, health checks e GitHub Actions;
+- configuração de publicação em servidor único com HTTPS automático.
 
-## Estado atual
+## Arquitetura
 
-Consulte:
+```mermaid
+flowchart LR
+    A[CSV ANP] --> B[Pipeline Python]
+    B --> C[(PostgreSQL)]
+    C --> D[Spring Boot]
+    E[FastAPI / baseline] --> D
+    D --> F[Nginx + React]
+    F --> G[Caddy / HTTPS]
+    G --> H[Pessoa usuária]
+```
 
-- [`docs/PROPOSTA_DO_PROJETO.md`](docs/PROPOSTA_DO_PROJETO.md): problema, objetivos e limites;
-- [`docs/arquitetura/ARQUITETURA_PLANEJADA.md`](docs/arquitetura/ARQUITETURA_PLANEJADA.md): evolução planejada;
-- [`docs/STATUS_DO_PROJETO.md`](docs/STATUS_DO_PROJETO.md): progresso dos módulos;
-- [`docs/dados/FONTE_DADOS_ANP.md`](docs/dados/FONTE_DADOS_ANP.md): origem e processo de amostragem;
-- [`docs/dados/DICIONARIO_DADOS.md`](docs/dados/DICIONARIO_DADOS.md): significado dos 16 campos;
-- [`docs/dados/RELATORIO_EXPLORACAO.md`](docs/dados/RELATORIO_EXPLORACAO.md): resultados e limitações;
-- [`docs/pipeline/INGESTAO_RAW.md`](docs/pipeline/INGESTAO_RAW.md): operação e regras da ingestão raw;
-- [`docs/pipeline/TRANSFORMACAO_VALIDACAO.md`](docs/pipeline/TRANSFORMACAO_VALIDACAO.md): limpeza, validações e rejeições;
-- [`docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`](docs/dados/DICIONARIO_DADOS_PROCESSADOS.md): esquema da saída processada;
-- [`docs/database/MODELO_RELACIONAL.md`](docs/database/MODELO_RELACIONAL.md): tabelas, chaves e relacionamentos;
-- [`docs/database/POSTGRESQL_LOCAL.md`](docs/database/POSTGRESQL_LOCAL.md): configuração, carga e testes do banco local;
-- [`docs/database/ANALISES_SQL.md`](docs/database/ANALISES_SQL.md): indicadores, filtros, resultados e limitações analíticas.
-- [`docs/backend/API_BACKEND.md`](docs/backend/API_BACKEND.md): arquitetura, endpoints, execução, testes e limites da API.
-- [`docs/frontend/DASHBOARD.md`](docs/frontend/DASHBOARD.md): componentes, integração, filtros, gráficos, execução e testes do dashboard.
-- [`docs/ml/BASELINE_MODEL.md`](docs/ml/BASELINE_MODEL.md): problema preditivo, preparação temporal, baseline, Ridge, métricas e limitações.
-- [`docs/ml/MODEL_SERVING.md`](docs/ml/MODEL_SERVING.md): seleção, persistência, inferência, versionamento e integração da estimativa.
-- [`docs/analytics/ANOMALY_DETECTION.md`](docs/analytics/ANOMALY_DETECTION.md): quartis, IQR, alertas, API, dashboard e limitações.
-- [`docs/quality/DOCKER_E_INTEGRACAO_CONTINUA.md`](docs/quality/DOCKER_E_INTEGRACAO_CONTINUA.md): imagens, serviços, health checks, lint, CI e operação do ambiente.
+Veja a [arquitetura atual](docs/arquitetura/ARQUITETURA_ATUAL.md) para fluxos,
+responsabilidades, limites de confiança e decisões.
 
-## Pré-requisitos atuais
+## Tecnologias
 
-Para executar o projeto até o Módulo 11 pelo ambiente reproduzível, é necessário ter:
+| Área | Tecnologias |
+| --- | --- |
+| dados | Python 3.11, biblioteca padrão e CSV |
+| banco | PostgreSQL 17 e SQL |
+| Back-end | Java 21, Spring Boot, JDBC e OpenAPI |
+| Front-end | React, TypeScript, Vite, Recharts e Nginx |
+| Machine Learning | pandas, scikit-learn, joblib e FastAPI |
+| qualidade | unittest, JUnit, Vitest, Ruff, Oxlint, Prettier e ShellCheck |
+| execução | Docker, Docker Compose, Caddy e GitHub Actions |
 
-- Git;
-- Docker com o plugin Docker Compose.
+## Início rápido
 
-Para executar cada tecnologia diretamente no computador e desenvolver fora dos contêineres, também são necessários:
-
-- um editor de texto;
-- Git para consultar o estado do repositório;
-- Python 3.9 ou compatível;
-- PostgreSQL 17 com `psql`, `createdb` e `createuser`;
-- Java 21 ou mais recente;
-- Maven 3.6.3 ou mais recente;
-- Node.js compatível com Vite 8 e npm;
-- um terminal para executar os comandos documentados.
-
-O serviço de estimativas requer um ambiente virtual com as versões de pandas, scikit-learn, joblib, FastAPI e Uvicorn fixadas em `ml/requirements.txt`. Não foi adicionado driver Python de PostgreSQL porque a carga continua utilizando o cliente oficial `psql`.
-
-## Como executar
-
-### Ambiente completo com Docker
-
-Na raiz do projeto:
+Pré-requisitos: Git, Docker e Docker Compose.
 
 ```bash
+git clone https://github.com/Sidney-Emanuel-Oliveira/FuelVision.git
+cd FuelVision
 cp .env.example .env
+```
+
+Substitua as duas senhas de exemplo no `.env`. Depois:
+
+```bash
 docker compose config --quiet
-docker compose build
-docker compose up --detach --wait
+docker compose up --detach --build --wait
 docker compose ps
+scripts/deploy_smoke.sh http://localhost:5173
 ```
 
-Substitua as senhas de exemplo somente no `.env`, que é ignorado pelo Git. O dashboard fica em `http://localhost:5173`. Para encerrar preservando o volume do banco, execute `docker compose down`.
+Abra [http://localhost:5173](http://localhost:5173).
 
-### Execução direta para desenvolvimento
-
-Na raiz do projeto, execute:
+Para encerrar preservando o banco:
 
 ```bash
-python3 exploration/explore_sample.py
-python3 -m pipeline.ingest_raw data/samples/precos-combustiveis-amostra.csv
-python3 -m pipeline.transform_data data/raw/precos-combustiveis-amostra__d5dd2159be5b.csv
-database/scripts/create_schema.sh
-database/scripts/load_processed.sh \
-  data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
-database/scripts/run_initial_queries.sh
-database/scripts/create_analytics_views.sh
-database/scripts/validate_analytics.sh
-database/scripts/run_analytics.sh
-python3 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r ml/requirements-dev.txt
-.venv/bin/python -m unittest discover -s tests -v
-FUELVISION_RUN_DB_TESTS=1 .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python -m ml.train_evaluate \
-  --input data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
-.venv/bin/python -m ml.artifact \
-  --input data/processed/precos-combustiveis-amostra__d5dd2159be5b__v1__processed.csv
-.venv/bin/python -m uvicorn ml.inference_api:app --host 127.0.0.1 --port 8000 --ws none
-backend/scripts/test.sh
-backend/scripts/test.sh --with-postgres
-backend/scripts/run.sh
-cd frontend
-npm install
-npm run typecheck
-npm run lint
-npm run format:check
-npm test
-npm run build
-npm run dev
+docker compose down
 ```
 
-Antes dos comandos de banco, copie `.env.example` para `.env`, substitua os valores locais e crie o papel e o banco conforme `docs/database/POSTGRESQL_LOCAL.md`. Os comandos com `FUELVISION_RUN_DB_TESTS=1` e `--with-postgres` ativam os testes que exigem PostgreSQL. Para usar todo o dashboard, mantenha o serviço Python, `backend/scripts/run.sh` e `npm run dev` em três terminais separados. O artefato em `ml/artifacts/` é gerado localmente e não é versionado.
+Consulte o [guia de instalação](docs/INSTALACAO.md) para configuração, logs,
+execução direta e solução de erros.
 
-Todas as verificações locais podem ser reunidas com:
+## API
+
+| Método | Caminho | Uso |
+| --- | --- | --- |
+| GET | `/api/prices` | observações paginadas |
+| GET | `/api/prices/summary` | indicadores por produto |
+| GET | `/api/prices/history` | histórico diário |
+| GET | `/api/prices/anomalies` | alertas IQR |
+| GET | `/api/locations/states` | estados disponíveis |
+| GET | `/api/locations/cities` | municípios por estado |
+| GET | `/api/predictions/model` | metadados do estimador |
+| POST | `/api/predictions` | estimativa experimental |
+
+Exemplo:
 
 ```bash
+curl --fail http://localhost:5173/api/prices/summary
+```
+
+Contratos, filtros e respostas estão na [referência da API](docs/REFERENCIA_API.md).
+
+## Dados e resultados verificáveis
+
+A fonte identificada possui 422.418 registros no CSV completo. O Git contém
+somente 60 registros selecionados deterministicamente para estudo.
+
+No teste temporal do experimento:
+
+| Abordagem | MAE | RMSE |
+| --- | ---: | ---: |
+| baseline por produto | 0,527108 | 0,810756 |
+| Ridge | 0,571978 | 0,816480 |
+
+O Ridge foi pior; por isso, o serviço usa o baseline simples e deixa essa
+limitação visível. Consulte [dados, métricas e limitações](docs/DADOS_METRICAS_LIMITACOES.md)
+e o [model card](docs/ml/MODEL_CARD.md).
+
+## Testes e qualidade
+
+Com as dependências locais instaladas:
+
+```bash
+scripts/quality.sh
 scripts/quality.sh --with-postgres
 ```
 
-Leia os documentos técnicos nesta ordem:
+A barreira completa reúne lint, formatação, testes Python/Java/Front-end e
+builds Maven/Vite. O GitHub Actions também constrói as imagens, inicia os
+serviços e executa smoke tests a cada push no `main` e pull request.
 
-1. `docs/pipeline/INGESTAO_RAW.md`;
-2. `docs/pipeline/TRANSFORMACAO_VALIDACAO.md`;
-3. `docs/dados/DICIONARIO_DADOS_PROCESSADOS.md`;
-4. `docs/database/MODELO_RELACIONAL.md`;
-5. `docs/database/POSTGRESQL_LOCAL.md`;
-6. `docs/database/ANALISES_SQL.md`;
-7. `docs/backend/API_BACKEND.md`.
-8. `docs/frontend/DASHBOARD.md`.
-9. `docs/ml/BASELINE_MODEL.md`.
-10. `docs/ml/MODEL_SERVING.md`.
-11. `docs/analytics/ANOMALY_DETECTION.md`.
-12. `docs/quality/DOCKER_E_INTEGRACAO_CONTINUA.md`.
+## Publicação
 
-## Limitações atuais
+O projeto possui uma configuração para servidor Linux único:
 
-- somente uma amostra não representativa foi versionada;
-- a carga no banco foi validada somente sobre a amostra processada;
-- as análises descrevem somente 60 observações controladas e não representam o mercado brasileiro;
-- muitos grupos por localidade possuem apenas uma ou duas observações;
-- a evolução diária não acompanha o mesmo conjunto de revendas em todas as datas;
-- o modelo guarda o estado atual da revenda, não seu histórico de alterações;
-- ainda não há ferramenta de migração ou histórico de lotes carregados;
-- a API é somente leitura e ainda não possui autenticação, CORS de produção, cache ou limite por cliente;
-- a comparação do dashboard realiza uma consulta de resumo por estado;
-- o histórico exibido pelo dashboard está limitado a 100 pontos por consulta;
-- não houve auditoria completa de acessibilidade com tecnologia assistiva;
-- o primeiro Ridge não superou o baseline por média de produto no teste temporal;
-- o experimento usa apenas 50 observações líquidas, com uma data de treino e uma de teste;
-- GNV não participa do baseline porque utiliza `BRL/m3`;
-- a estimativa usa o baseline simples por produto, não o Ridge, e só aceita datas entre 03/01/2026 e 01/02/2026;
-- o artefato é gerado a partir de apenas 50 observações líquidas e precisa ser criado localmente antes de iniciar o serviço;
-- o serviço de inferência não possui autenticação, monitoramento, implantação produtiva ou atualização automática;
-- a estimativa é pontual e não possui intervalo de incerteza;
-- a detecção IQR usa somente dez observações por produto e pode sinalizar diferenças regionais legítimas;
-- um alerta estatístico não identifica sua causa e exige investigação humana;
-- não existem conclusões estatísticas ou métricas de negócio.
-- o Compose é destinado a desenvolvimento e CI, sem TLS, backup ou gestão profissional de segredos;
-- as imagens Docker são locais e não são publicadas em registry;
-- os health checks confirmam disponibilidade, mas não desempenho ou capacidade;
-- o GitHub Actions valida o projeto, mas não executa deploy.
+```bash
+docker compose \
+  --env-file deploy/.env \
+  -f compose.yaml \
+  -f compose.production.yaml \
+  up --detach --build --wait
+```
 
-Essas limitações são intencionais e preservam a progressão definida no plano.
+Ela exige domínio e senhas fora do Git, acrescenta Caddy, HTTPS, cabeçalhos de
+segurança e políticas de reinício. Nenhum servidor externo é criado
+automaticamente. Leia o [guia de publicação](docs/DEPLOY.md) antes de expor o
+sistema.
 
-## Regras de contribuição
+## Documentação
 
-- trabalhar em apenas um módulo por vez;
-- não versionar `.env`, credenciais, datasets grandes ou artefatos gerados;
-- executar e registrar as verificações aplicáveis;
-- documentar decisões e limitações;
-- executar commit e push somente após a conclusão e aprovação das verificações do módulo.
+- [instalação](docs/INSTALACAO.md);
+- [arquitetura atual](docs/arquitetura/ARQUITETURA_ATUAL.md);
+- [referência da API](docs/REFERENCIA_API.md);
+- [dados, métricas e limitações](docs/DADOS_METRICAS_LIMITACOES.md);
+- [model card](docs/ml/MODEL_CARD.md);
+- [segurança](docs/SEGURANCA.md) e [política de relatos](SECURITY.md);
+- [acessibilidade](docs/ACESSIBILIDADE.md);
+- [Docker e integração contínua](docs/quality/DOCKER_E_INTEGRACAO_CONTINUA.md);
+- [demonstração e portfólio](docs/DEMONSTRACAO_PORTFOLIO.md);
+- [plano oficial](docs/PLANO_FUELVISION.md) e [status](docs/STATUS_DO_PROJETO.md).
+
+## Limitações
+
+- amostra pequena, não aleatória e não representativa;
+- atualização de dados não automática;
+- estimativa constante por produto e sem intervalo de incerteza;
+- alertas IQR com grupos de apenas dez observações;
+- ausência de autenticação, rate limit, SLA e monitoramento;
+- publicação em instância única, sem alta disponibilidade ou backup automático;
+- revisão de acessibilidade sem teste formal com tecnologia assistiva;
+- licença do código-fonte ainda não selecionada pelo proprietário.
+
+## Uso responsável
+
+O FuelVision é uma demonstração educacional e técnica. Não é fonte oficial,
+recomendação financeira, mecanismo de fiscalização nem garantia de preços.
+Consulte a ANP para os dados oficiais e preserve os avisos ao reutilizar
+resultados ou capturas.
+
+## Autor
+
+[Sidney Emanuel Oliveira](https://github.com/Sidney-Emanuel-Oliveira)

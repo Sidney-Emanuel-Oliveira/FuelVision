@@ -16,8 +16,12 @@ Atualizado em: 28/07/2026.
 | 9      | Previsão Disponível pela Aplicação      | Concluído    | 28/07/2026 | Baseline persistido, FastAPI, integração Spring, painel preditivo e 47 testes     |
 | 10     | Detecção de Anomalias                   | Concluído    | 28/07/2026 | IQR, endpoint paginado, motivos, painel responsável e 49 testes                   |
 | 11     | Qualidade, Docker e Integração Contínua | Concluído    | 28/07/2026 | Quatro imagens, Compose, health checks, lint, CI e seis testes de infraestrutura  |
-| 12     | Documentação Profissional e Deploy      | Não iniciado | —          | —                                                                                |
+| 12     | Documentação Profissional e Deploy      | Concluído    | 28/07/2026 | Documentação profissional, deploy com HTTPS, segurança, acessibilidade e portfólio |
 
 ## Observação
 
-Os Módulos 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 e 11 estão concluídos. O Módulo 12 aguarda autorização.
+Os Módulos 0 a 12 estão concluídos. O fluxo principal do plano oficial foi
+implementado, testado e preparado para publicação em um servidor com domínio.
+Uma instância pública ainda depende da contratação desse servidor, da configuração
+do DNS e das credenciais definidas pelo proprietário. Possíveis módulos opcionais
+devem ser analisados separadamente; nenhum deles foi iniciado automaticamente.

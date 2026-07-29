@@ -17,6 +17,12 @@ if [[ ! -x "${PYTHON_BIN}" ]]; then
     exit 1
 fi
 
+if ! "${PYTHON_BIN}" -c 'import sys; raise SystemExit(sys.version_info < (3, 11))'; then
+    echo "Python 3.11 or newer is required: ${PYTHON_BIN}" >&2
+    echo "Recreate .venv with a supported Python version." >&2
+    exit 1
+fi
+
 if [[ ! -d "${PROJECT_ROOT}/frontend/node_modules" ]]; then
     echo "Front-end dependencies not found. Run npm ci inside frontend/." >&2
     exit 1

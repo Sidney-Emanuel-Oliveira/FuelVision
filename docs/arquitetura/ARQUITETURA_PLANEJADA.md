@@ -6,7 +6,7 @@ Este documento descreve como o FuelVision poderá crescer. Ele não afirma que o
 
 **Arquitetura de software** é a organização das partes de um sistema, de suas responsabilidades e das formas de comunicação entre elas. Ela é importante porque evita misturar, por exemplo, preparação de dados com apresentação de gráficos.
 
-## 2. Estado real no Módulo 11
+## 2. Estado real no Módulo 12
 
 Os componentes planejados nos módulos anteriores foram implementados e agora
 podem ser executados diretamente ou em contêineres.
@@ -18,9 +18,10 @@ amostra controlada → transformação → PostgreSQL → Spring Boot → Nginx 
                                               ↘ serviço Python de estimativas
 ```
 
-O Docker Compose cria quatro serviços: `postgres`, `prediction`, `backend` e
-`frontend`. Health checks controlam a ordem de inicialização. A integração
-contínua repete lint, testes, builds, inicialização e smoke tests no GitHub.
+O Docker Compose base cria quatro serviços: `postgres`, `prediction`, `backend`
+e `frontend`. A configuração de publicação acrescenta o gateway Caddy com
+HTTPS. Health checks controlam a ordem de inicialização. A integração contínua
+repete lint, testes, builds, inicialização e smoke tests no GitHub.
 
 ## 3. Visão de evolução
 
@@ -66,8 +67,9 @@ Consumir a API e apresentar indicadores, filtros, estados de carregamento e erro
 
 Definir problemas mensuráveis, separar dados corretamente, comparar modelos com uma referência simples e comunicar incertezas.
 
-Essas responsabilidades existem no repositório. O Módulo 12 poderá melhorar a
-documentação profissional e tratar o deploy, mas não foi antecipado aqui.
+Essas responsabilidades existem no repositório. A documentação profissional e
+a preparação de deploy foram consolidadas no Módulo 12. O estado executável está
+detalhado em `docs/arquitetura/ARQUITETURA_ATUAL.md`.
 
 ## 5. Dependências entre etapas
 
@@ -120,8 +122,9 @@ Escolha: não instalar dependências agora.
 ## 8. Limitações atuais
 
 - a arquitetura executa somente a amostra controlada e não representativa;
-- os contêineres são destinados a desenvolvimento e CI;
-- não existem TLS, backup, registry de imagens ou gestão profissional de segredos;
+- a publicação preparada usa uma única instância de cada serviço;
+- TLS foi configurado, mas depende de servidor e domínio externos;
+- backup é manual e não existe registry próprio de imagens;
 - health checks indicam disponibilidade, não desempenho;
 - a CI valida o sistema, mas não realiza deploy;
-- o Módulo 12 ainda não foi iniciado.
+- a licença do código ainda depende de decisão do proprietário.
