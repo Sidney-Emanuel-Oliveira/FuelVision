@@ -1,4 +1,4 @@
-FROM python:3.11-slim AS data-builder
+FROM python:3.14-slim AS data-builder
 
 WORKDIR /build
 
