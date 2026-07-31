@@ -78,6 +78,19 @@ class VercelDeploymentContractTest(unittest.TestCase):
         self.assertIn("http://host.docker.internal:", entrypoint)
         self.assertIn('java_bin="/opt/java/openjdk/bin/java"', entrypoint)
         self.assertIn('exec "$java_bin"', entrypoint)
+        self.assertIn("-XX:TieredStopAtLevel=1", entrypoint)
+        self.assertIn("-Dspring.main.lazy-initialization=true", entrypoint)
+        self.assertIn("-jar /app/application.jar", entrypoint)
+
+    def test_backend_uses_spring_boot_fast_start_layout(self) -> None:
+        dockerfile = (PROJECT_ROOT / "backend" / "Dockerfile.vercel").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("-Djarmode=tools", dockerfile)
+        self.assertIn("--layers", dockerfile)
+        self.assertIn("/build/extracted/dependencies/", dockerfile)
+        self.assertIn("/build/extracted/application/", dockerfile)
 
     def test_container_commands_do_not_depend_on_runtime_path(self) -> None:
         prediction_dockerfile = (PROJECT_ROOT / "Dockerfile.vercel").read_text(

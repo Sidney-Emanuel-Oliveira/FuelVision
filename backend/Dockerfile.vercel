@@ -4,7 +4,16 @@ WORKDIR /build
 
 COPY pom.xml ./pom.xml
 COPY src ./src
-RUN mvn package -DskipTests
+RUN mvn package -DskipTests \
+    && cp \
+        target/fuelvision-backend-0.0.1-SNAPSHOT.jar \
+        /build/application.jar \
+    && /opt/java/openjdk/bin/java \
+        -Djarmode=tools \
+        -jar /build/application.jar \
+        extract \
+        --layers \
+        --destination /build/extracted
 
 FROM eclipse-temurin:21-jre-alpine
 
@@ -13,9 +22,10 @@ WORKDIR /app
 RUN addgroup -S fuelvision \
     && adduser -S -G fuelvision -u 10001 fuelvision
 
-COPY --from=builder \
-    /build/target/fuelvision-backend-0.0.1-SNAPSHOT.jar \
-    /app/fuelvision-backend.jar
+COPY --from=builder /build/extracted/dependencies/ /app/
+COPY --from=builder /build/extracted/spring-boot-loader/ /app/
+COPY --from=builder /build/extracted/snapshot-dependencies/ /app/
+COPY --from=builder /build/extracted/application/ /app/
 COPY docker-entrypoint.vercel.sh /app/docker-entrypoint.vercel.sh
 
 RUN chmod 755 /app/docker-entrypoint.vercel.sh

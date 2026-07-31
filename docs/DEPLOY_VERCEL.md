@@ -55,9 +55,11 @@ ampla.
 - `frontend/`: serviço Vite servido nos caminhos públicos que não começam com
   `/api`;
 - `backend/Dockerfile.vercel`: constrói o Spring Boot e utiliza a porta
-  fornecida pela Vercel;
+  fornecida pela Vercel; o JAR é extraído em camadas para reduzir o custo de
+  inicialização;
 - `backend/docker-entrypoint.vercel.sh`: inicia o Spring Boot e adapta apenas o
-  binding local produzido por `vercel dev` no Docker Desktop;
+  binding local produzido por `vercel dev` no Docker Desktop; na Vercel, a
+  criação tardia de componentes reduz o tempo necessário para abrir a porta;
 - `Dockerfile.vercel`: gera o artefato reproduzível e inicia o FastAPI na
   porta fornecida pela Vercel;
 - `deploy/vercel.env.example`: modelo local, sem credenciais reais, para
@@ -328,6 +330,28 @@ pública por decisão de segurança; a chamada correta passa pelo Spring Boot.
 **Cold start** é o tempo necessário para iniciar uma instância que estava
 reduzida a zero. Os contêineres e o PostgreSQL serverless podem apresentar essa
 demora depois de um período sem tráfego.
+
+### O log informa `could not connect to $PORT=80`
+
+Esse erro significa que a Vercel não encontrou o servidor HTTP antes do limite
+de inicialização da instância. Ele é diferente de uma falha de banco: primeiro
+confirme no log se o Spring Boot chegou a registrar `Tomcat started on port 80`.
+
+O perfil da Vercel reduz esse risco de duas formas:
+
+- usa o layout extraído recomendado pelo Spring Boot, evitando parte do custo
+  de leitura de bibliotecas dentro de um único JAR;
+- habilita **inicialização preguiçosa**, que abre o servidor primeiro e cria
+  componentes somente quando a primeira requisição precisar deles.
+
+A inicialização preguiçosa transfere parte do trabalho para a primeira chamada.
+Por isso, os testes e o smoke test precisam acessar endpoints reais, e não
+somente confirmar que a página estática abriu.
+
+Se o erro continuar mesmo com `Tomcat started on port 80`, verifique a data e o
+commit da implantação. Contêineres na Vercel ainda são um recurso beta; falhas
+intermitentes de cold start devem ser verificadas nos registros antes de
+alterar credenciais ou recriar o banco.
 
 ### O build excede limites
 

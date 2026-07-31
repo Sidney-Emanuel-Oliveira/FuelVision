@@ -23,5 +23,8 @@ if [ ! -x "$java_bin" ]; then
 fi
 
 exec "$java_bin" \
+    -XX:+UseSerialGC \
+    -XX:TieredStopAtLevel=1 \
     -Dserver.port="${PORT:-80}" \
-    -jar /app/fuelvision-backend.jar
+    -Dspring.main.lazy-initialization=true \
+    -jar /app/application.jar
