@@ -1,5 +1,10 @@
 # Publicação do FuelVision em um servidor
 
+> [!NOTE]
+> Este guia descreve a estratégia de servidor Linux com Docker Compose. Para
+> executar React, Spring Boot e FastAPI na Vercel com PostgreSQL externo,
+> consulte o [guia específico da Vercel](DEPLOY_VERCEL.md).
+
 ## Resultado esperado
 
 Este guia prepara uma instalação pública em um único servidor Linux com Docker,

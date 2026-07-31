@@ -37,6 +37,7 @@ docs/aprendizado/
 # Editores e sistema operacional
 .idea/
 .vscode/
+.vercel/
 .DS_Store
 *.swp
 *~

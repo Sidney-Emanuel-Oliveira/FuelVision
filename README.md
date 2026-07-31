@@ -22,7 +22,8 @@ estudar preços de combustíveis com uma amostra pública controlada da ANP.
 - estimativa experimental servida por FastAPI;
 - detecção de comportamentos atípicos pelo intervalo interquartil;
 - quatro imagens Docker, health checks e GitHub Actions;
-- configuração de publicação em servidor único com HTTPS automático.
+- configuração de publicação em servidor único com HTTPS automático;
+- perfil full stack para Vercel Services com PostgreSQL externo.
 
 ## Arquitetura
 
@@ -134,7 +135,21 @@ serviços e executa smoke tests a cada push no `main` e pull request.
 
 ## Publicação
 
-O projeto possui uma configuração para servidor Linux único:
+O projeto possui duas estratégias de publicação.
+
+Para uma demonstração full stack na Vercel, use o perfil que reúne React,
+Spring Boot e FastAPI no mesmo domínio e mantém o PostgreSQL em um provedor
+gerenciado:
+
+```bash
+scripts/prepare_vercel_database.sh
+```
+
+Leia o [guia de publicação na Vercel](docs/DEPLOY_VERCEL.md) antes de criar
+recursos externos. A publicação ainda exige conta, banco, credenciais e revisão
+dos possíveis custos.
+
+Para um servidor Linux único:
 
 ```bash
 docker compose \
@@ -152,6 +167,7 @@ sistema.
 ## Documentação
 
 - [instalação](docs/INSTALACAO.md);
+- [publicação na Vercel](docs/DEPLOY_VERCEL.md);
 - [arquitetura atual](docs/arquitetura/ARQUITETURA_ATUAL.md);
 - [referência da API](docs/REFERENCIA_API.md);
 - [dados, métricas e limitações](docs/DADOS_METRICAS_LIMITACOES.md);
@@ -170,6 +186,7 @@ sistema.
 - alertas IQR com grupos de apenas dez observações;
 - ausência de autenticação, rate limit, SLA e monitoramento;
 - publicação em instância única, sem alta disponibilidade ou backup automático;
+- perfil Vercel dependente de Services em beta e PostgreSQL externo;
 - revisão de acessibilidade sem teste formal com tecnologia assistiva;
 - licença do código-fonte ainda não selecionada pelo proprietário.
 

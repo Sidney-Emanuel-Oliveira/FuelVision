@@ -10,6 +10,7 @@ PROFESSIONAL_DOCUMENTS = (
     "SECURITY.md",
     "docs/INSTALACAO.md",
     "docs/DEPLOY.md",
+    "docs/DEPLOY_VERCEL.md",
     "docs/REFERENCIA_API.md",
     "docs/DADOS_METRICAS_LIMITACOES.md",
     "docs/SEGURANCA.md",

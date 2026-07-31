@@ -1,0 +1,32 @@
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+
+WORKDIR /build
+
+COPY pom.xml ./pom.xml
+COPY src ./src
+RUN mvn package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+RUN addgroup -S fuelvision \
+    && adduser -S -G fuelvision -u 10001 fuelvision
+
+COPY --from=builder \
+    /build/target/fuelvision-backend-0.0.1-SNAPSHOT.jar \
+    /app/fuelvision-backend.jar
+COPY docker-entrypoint.vercel.sh /app/docker-entrypoint.vercel.sh
+
+RUN chmod 755 /app/docker-entrypoint.vercel.sh
+
+USER fuelvision
+
+EXPOSE 80
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=20s --retries=9 \
+    CMD wget -q -O - "http://127.0.0.1:${PORT:-80}/actuator/health" \
+        | grep -q '"status":"UP"' \
+        || exit 1
+
+CMD ["/app/docker-entrypoint.vercel.sh"]

@@ -1,6 +1,6 @@
 # Status do projeto FuelVision
 
-Atualizado em: 28/07/2026.
+Atualizado em: 30/07/2026.
 
 | Módulo | Nome                                    | Status       | Data       | Principais entregas                                                              |
 | ------ | --------------------------------------- | ------------ | ---------- | -------------------------------------------------------------------------------- |
@@ -22,6 +22,15 @@ Atualizado em: 28/07/2026.
 
 Os Módulos 0 a 12 estão concluídos. O fluxo principal do plano oficial foi
 implementado, testado e preparado para publicação em um servidor com domínio.
-Uma instância pública ainda depende da contratação desse servidor, da configuração
-do DNS e das credenciais definidas pelo proprietário. Possíveis módulos opcionais
-devem ser analisados separadamente; nenhum deles foi iniciado automaticamente.
+
+Em 30/07/2026, uma manutenção posterior ao Módulo 12 acrescentou um perfil para
+Vercel Services: Vite público, Spring Boot em contêiner, FastAPI privado por
+binding e PostgreSQL gerenciado externo. A configuração local e o procedimento
+de inicialização do banco foram preparados. Os três serviços foram construídos
+pela Vercel CLI 58.4.4 e o teste de fumaça integrado passou localmente. Nenhuma
+conta, banco ou implantação externa foi criada. A disponibilidade pública
+continua dependendo das credenciais e decisões do proprietário e da liberação
+do recurso Services na conta da Vercel.
+
+Possíveis módulos opcionais devem ser analisados separadamente; nenhum deles foi
+iniciado automaticamente.
