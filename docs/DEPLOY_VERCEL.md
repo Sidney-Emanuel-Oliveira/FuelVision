@@ -43,6 +43,13 @@ interno diretamente. Como compatibilidade adicional, o Back-end também reconhec
 `PREDICTION_URL`, nome automático fornecido pela plataforma para o serviço com
 esse nome. A ligação explícita continua sendo a opção principal.
 
+**Autoridade certificadora**, ou **CA**, é a entidade usada para confirmar que
+um certificado HTTPS pertence ao serviço esperado. A Vercel fornece ao ambiente
+um pacote de certificados em `SSL_CERT_FILE`. Como o Java mantém uma lista
+própria de autoridades, o cliente de previsão combina a lista padrão da JVM com
+esse pacote durante a execução. A validação HTTPS e a conferência do nome do
+host permanecem habilitadas.
+
 **Variável de ambiente** é uma configuração fornecida fora do código. As
 credenciais do PostgreSQL ficam nas configurações protegidas da Vercel e nunca
 no Git.
@@ -254,6 +261,10 @@ esse valor internamente em cada implantação.
 Também não cadastre `PREDICTION_URL` manualmente. Ela é apenas um fallback para
 o endereço automático gerado pela própria Vercel.
 
+Não cadastre nem substitua `SSL_CERT_FILE`. Essa variável e o arquivo indicado
+por ela são administrados pela plataforma. O Back-end apenas lê os certificados
+em tempo de execução e não registra o caminho nem o conteúdo deles.
+
 Uma alteração nas variáveis só afeta uma nova implantação. Depois de alterar
 qualquer valor, faça um redeploy.
 
@@ -329,6 +340,22 @@ Confira as seis variáveis PostgreSQL, o modo SSL e os logs do serviço
 
 Confira o build e os logs do serviço `prediction`. O serviço não possui rota
 pública por decisão de segurança; a chamada correta passa pelo Spring Boot.
+
+Se o Back-end registrar `SunCertPathBuilderException`, a JVM não reconheceu a
+cadeia TLS usada no binding privado. No início de uma chamada, o log esperado é
+semelhante a:
+
+```text
+Prediction TLS runtime CA bundle configured: true, certificates=<quantidade>
+Prediction service client configured: localTarget=false
+```
+
+O número depende do pacote fornecido pela plataforma. Se aparecer
+`configured: false` ou `bundle is not readable`, confira se a implantação usa o
+commit mais recente e não crie uma variável `SSL_CERT_FILE` manual. O código
+mantém a lista pública padrão do Java e acrescenta somente autoridades X.509
+presentes no arquivo da plataforma; ele não usa uma configuração do tipo
+“confiar em qualquer certificado”.
 
 ### A primeira chamada demora mais
 
