@@ -331,6 +331,12 @@ pública por decisão de segurança; a chamada correta passa pelo Spring Boot.
 reduzida a zero. Os contêineres e o PostgreSQL serverless podem apresentar essa
 demora depois de um período sem tráfego.
 
+O serviço de previsão abre o servidor HTTP antes de importar o conjunto
+completo de bibliotecas científicas e carregar o artefato. O modelo é carregado
+uma única vez, de forma protegida contra chamadas concorrentes, quando a
+primeira requisição realmente precisar dele. Assim, a Vercel consegue detectar
+a porta rapidamente; a primeira consulta ao modelo assume o custo restante.
+
 ### O log informa `could not connect to $PORT=80`
 
 Esse erro significa que a Vercel não encontrou o servidor HTTP antes do limite

@@ -90,6 +90,23 @@ class PredictorTests(unittest.TestCase):
 
 
 class InferenceApiTests(unittest.TestCase):
+    def test_defers_artifact_loading_until_first_model_request(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            dataset = root / "processed.csv"
+            artifact_path = root / "model.joblib"
+            _write_dataset(dataset)
+            save_artifact(train_artifact(dataset), artifact_path)
+            application = create_app(artifact_path)
+
+            self.assertIsNone(application.state.predictor)
+            with TestClient(application) as client:
+                self.assertIsNone(application.state.predictor)
+                response = client.get("/model-info")
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIsNotNone(application.state.predictor)
+
     def test_exposes_model_information_and_prediction(self) -> None:
         with _client_for_test_artifact() as client:
             model_response = client.get("/model-info")

@@ -101,9 +101,15 @@ class VercelDeploymentContractTest(unittest.TestCase):
         prediction_dockerfile = (PROJECT_ROOT / "Dockerfile.vercel").read_text(
             encoding="utf-8"
         )
+        prediction_api = (PROJECT_ROOT / "ml" / "inference_api.py").read_text(
+            encoding="utf-8"
+        )
 
         self.assertIn("/opt/venv/bin/python -m uvicorn", prediction_dockerfile)
         self.assertIn("/opt/venv/bin/python -c", prediction_dockerfile)
+        self.assertIn("def _get_predictor", prediction_api)
+        self.assertIn("predictor_lock", prediction_api)
+        self.assertNotIn("lifespan=lifespan", prediction_api)
 
 
 if __name__ == "__main__":

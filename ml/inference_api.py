@@ -3,17 +3,18 @@
 from __future__ import annotations
 
 import os
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
-from typing import Optional
+from threading import Lock
+from typing import TYPE_CHECKING, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-from ml.artifact import DEFAULT_ARTIFACT_PATH
-from ml.inference import ModelPredictor, PredictionInputError
+if TYPE_CHECKING:
+    from ml.inference import ModelPredictor
+
+DEFAULT_MODEL_PATH = Path("ml/artifacts/fuel-price-baseline-v1.joblib")
 
 
 def _to_camel(name: str) -> str:
@@ -64,36 +65,48 @@ class ModelInfoResponse(ApiModel):
 
 
 def create_app(artifact_path: Optional[Path] = None) -> FastAPI:
-    @asynccontextmanager
-    async def lifespan(application: FastAPI) -> AsyncIterator[None]:
-        configured_path = artifact_path or Path(
-            os.environ.get("FUELVISION_MODEL_PATH", DEFAULT_ARTIFACT_PATH)
-        )
-        application.state.predictor = ModelPredictor.from_path(configured_path)
-        yield
-        del application.state.predictor
-
     application = FastAPI(
         title="FuelVision Prediction Service",
         version="1.0.0",
         description="Internal service for documented experimental estimates.",
-        lifespan=lifespan,
     )
+    application.state.artifact_path = artifact_path or Path(
+        os.environ.get("FUELVISION_MODEL_PATH", DEFAULT_MODEL_PATH)
+    )
+    application.state.predictor = None
+    application.state.predictor_lock = Lock()
 
     @application.get("/model-info", response_model=ModelInfoResponse)
     def model_info(request: Request) -> dict[str, object]:
-        predictor: ModelPredictor = request.app.state.predictor
+        predictor = _get_predictor(request)
         return predictor.model_info()
 
     @application.post("/predict", response_model=PredictionResponse)
     def predict(payload: PredictionRequest, request: Request) -> dict[str, object]:
-        predictor: ModelPredictor = request.app.state.predictor
+        from ml.inference import PredictionInputError
+
+        predictor = _get_predictor(request)
         try:
             return predictor.predict(payload.product, payload.collection_date)
         except PredictionInputError as error:
             raise HTTPException(status_code=400, detail=str(error)) from error
 
     return application
+
+
+def _get_predictor(request: Request) -> ModelPredictor:
+    predictor = request.app.state.predictor
+    if predictor is not None:
+        return predictor
+
+    with request.app.state.predictor_lock:
+        predictor = request.app.state.predictor
+        if predictor is None:
+            from ml.inference import ModelPredictor
+
+            predictor = ModelPredictor.from_path(request.app.state.artifact_path)
+            request.app.state.predictor = predictor
+        return predictor
 
 
 app = create_app()
