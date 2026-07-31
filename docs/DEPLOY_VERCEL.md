@@ -39,7 +39,9 @@ Boot e os outros caminhos chegam ao Vite.
 **Service binding** é uma ligação privada entre dois serviços. O Back-end recebe
 automaticamente a variável `FUELVISION_PREDICTION_URL`, que aponta para o
 FastAPI da mesma implantação. O navegador não consegue chamar esse serviço
-interno diretamente.
+interno diretamente. Como compatibilidade adicional, o Back-end também reconhece
+`PREDICTION_URL`, nome automático fornecido pela plataforma para o serviço com
+esse nome. A ligação explícita continua sendo a opção principal.
 
 **Variável de ambiente** é uma configuração fornecida fora do código. As
 credenciais do PostgreSQL ficam nas configurações protegidas da Vercel e nunca
@@ -248,6 +250,9 @@ POSTGRES_SSLMODE
 Use `require` em `POSTGRES_SSLMODE` quando o provedor confirmar suporte a SSL.
 Não cadastre `FUELVISION_PREDICTION_URL`: o binding do `vercel.json` fornece
 esse valor internamente em cada implantação.
+
+Também não cadastre `PREDICTION_URL` manualmente. Ela é apenas um fallback para
+o endereço automático gerado pela própria Vercel.
 
 Uma alteração nas variáveis só afeta uma nova implantação. Depois de alterar
 qualquer valor, faça um redeploy.

@@ -120,6 +120,12 @@ class VercelDeploymentContractTest(unittest.TestCase):
             / "application.properties"
         ).read_text(encoding="utf-8")
         self.assertIn(
+            "fuelvision.prediction.base-url="
+            "${FUELVISION_PREDICTION_URL:"
+            "${PREDICTION_URL:http://localhost:8000}}",
+            backend_properties,
+        )
+        self.assertIn(
             "spring.http.clients.read-timeout="
             "${FUELVISION_PREDICTION_READ_TIMEOUT:20s}",
             backend_properties,
