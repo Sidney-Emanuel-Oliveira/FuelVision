@@ -79,7 +79,10 @@ class VercelDeploymentContractTest(unittest.TestCase):
         self.assertIn('java_bin="/opt/java/openjdk/bin/java"', entrypoint)
         self.assertIn('exec "$java_bin"', entrypoint)
         self.assertIn("-XX:TieredStopAtLevel=1", entrypoint)
+        self.assertIn("-XX:SharedArchiveFile=/app/application.jsa", entrypoint)
         self.assertIn("-Dspring.main.lazy-initialization=true", entrypoint)
+        self.assertIn("-Dspringdoc.api-docs.enabled=false", entrypoint)
+        self.assertIn("-Dspringdoc.swagger-ui.enabled=false", entrypoint)
         self.assertIn("-jar /app/application.jar", entrypoint)
 
     def test_backend_uses_spring_boot_fast_start_layout(self) -> None:
@@ -91,6 +94,8 @@ class VercelDeploymentContractTest(unittest.TestCase):
         self.assertIn("--layers", dockerfile)
         self.assertIn("/build/extracted/dependencies/", dockerfile)
         self.assertIn("/build/extracted/application/", dockerfile)
+        self.assertIn("-XX:ArchiveClassesAtExit=/app/application.jsa", dockerfile)
+        self.assertIn("-Dspring.context.exit=onRefresh", dockerfile)
 
     def test_container_commands_do_not_depend_on_runtime_path(self) -> None:
         prediction_dockerfile = (PROJECT_ROOT / "Dockerfile.vercel").read_text(

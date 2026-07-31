@@ -24,7 +24,10 @@ fi
 
 exec "$java_bin" \
     -XX:+UseSerialGC \
+    -XX:SharedArchiveFile=/app/application.jsa \
     -XX:TieredStopAtLevel=1 \
     -Dserver.port="${PORT:-80}" \
     -Dspring.main.lazy-initialization=true \
+    -Dspringdoc.api-docs.enabled=false \
+    -Dspringdoc.swagger-ui.enabled=false \
     -jar /app/application.jar

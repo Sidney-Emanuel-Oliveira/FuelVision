@@ -56,7 +56,7 @@ ampla.
   `/api`;
 - `backend/Dockerfile.vercel`: constrói o Spring Boot e utiliza a porta
   fornecida pela Vercel; o JAR é extraído em camadas para reduzir o custo de
-  inicialização;
+  inicialização e gera um arquivo AppCDS com classes previamente preparadas;
 - `backend/docker-entrypoint.vercel.sh`: inicia o Spring Boot e adapta apenas o
   binding local produzido por `vercel dev` no Docker Desktop; na Vercel, a
   criação tardia de componentes reduz o tempo necessário para abrir a porta;
@@ -342,11 +342,21 @@ O perfil da Vercel reduz esse risco de duas formas:
 - usa o layout extraído recomendado pelo Spring Boot, evitando parte do custo
   de leitura de bibliotecas dentro de um único JAR;
 - habilita **inicialização preguiçosa**, que abre o servidor primeiro e cria
-  componentes somente quando a primeira requisição precisar deles.
+  componentes somente quando a primeira requisição precisar deles;
+- utiliza **AppCDS**, um arquivo criado durante o build com classes da aplicação
+  em um formato que a JVM consegue carregar mais rapidamente.
 
 A inicialização preguiçosa transfere parte do trabalho para a primeira chamada.
 Por isso, os testes e o smoke test precisam acessar endpoints reais, e não
 somente confirmar que a página estática abriu.
+
+O AppCDS aumenta o tamanho da imagem porque adiciona o cache `application.jsa`.
+Essa é uma troca consciente: um pouco mais de armazenamento para diminuir o
+tempo de inicialização. O cache precisa ser reconstruído quando o código, as
+dependências ou a versão da JVM mudarem. Mensagens `Preload Warning` durante a
+criação podem indicar classes dinâmicas que não entraram no cache; elas não
+representam falha quando o build termina com sucesso e o contêiner validado
+utiliza o arquivo.
 
 Se o erro continuar mesmo com `Tomcat started on port 80`, verifique a data e o
 commit da implantação. Contêineres na Vercel ainda são um recurso beta; falhas

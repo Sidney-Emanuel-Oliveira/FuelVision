@@ -28,7 +28,17 @@ COPY --from=builder /build/extracted/snapshot-dependencies/ /app/
 COPY --from=builder /build/extracted/application/ /app/
 COPY docker-entrypoint.vercel.sh /app/docker-entrypoint.vercel.sh
 
-RUN chmod 755 /app/docker-entrypoint.vercel.sh
+RUN chmod 755 /app/docker-entrypoint.vercel.sh \
+    && /opt/java/openjdk/bin/java \
+        -XX:+UseSerialGC \
+        -XX:ArchiveClassesAtExit=/app/application.jsa \
+        -XX:TieredStopAtLevel=1 \
+        -Dserver.port=0 \
+        -Dspring.context.exit=onRefresh \
+        -Dspring.main.lazy-initialization=true \
+        -Dspringdoc.api-docs.enabled=false \
+        -Dspringdoc.swagger-ui.enabled=false \
+        -jar /app/application.jar
 
 USER fuelvision
 
