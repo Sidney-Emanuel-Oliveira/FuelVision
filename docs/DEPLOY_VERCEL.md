@@ -335,7 +335,12 @@ O serviço de previsão abre o servidor HTTP antes de importar o conjunto
 completo de bibliotecas científicas e carregar o artefato. O modelo é carregado
 uma única vez, de forma protegida contra chamadas concorrentes, quando a
 primeira requisição realmente precisar dele. Assim, a Vercel consegue detectar
-a porta rapidamente; a primeira consulta ao modelo assume o custo restante.
+a porta rapidamente; a primeira consulta ao modelo assume o custo restante. O
+Back-end aguarda até 20 segundos por essa primeira resposta, pois a criação de
+uma nova instância na plataforma pode ultrapassar o tempo de uma chamada já
+aquecida. Esse limite pode ser ajustado por
+`FUELVISION_PREDICTION_READ_TIMEOUT` quando houver uma necessidade operacional
+comprovada.
 
 ### O log informa `could not connect to $PORT=80`
 

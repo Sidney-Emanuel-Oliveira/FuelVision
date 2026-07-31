@@ -111,6 +111,20 @@ class VercelDeploymentContractTest(unittest.TestCase):
         self.assertIn("predictor_lock", prediction_api)
         self.assertNotIn("lifespan=lifespan", prediction_api)
 
+        backend_properties = (
+            PROJECT_ROOT
+            / "backend"
+            / "src"
+            / "main"
+            / "resources"
+            / "application.properties"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "spring.http.clients.read-timeout="
+            "${FUELVISION_PREDICTION_READ_TIMEOUT:20s}",
+            backend_properties,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
