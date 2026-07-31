@@ -51,6 +51,6 @@ USER fuelvision
 EXPOSE 80
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=6 \
-    CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.getenv('PORT', '80') + '/model-info', timeout=2)"
+    CMD /opt/venv/bin/python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.getenv('PORT', '80') + '/model-info', timeout=2)"
 
-CMD ["sh", "-c", "exec python -m uvicorn ml.inference_api:app --host 0.0.0.0 --port ${PORT:-80} --ws none"]
+CMD ["sh", "-c", "exec /opt/venv/bin/python -m uvicorn ml.inference_api:app --host 0.0.0.0 --port ${PORT:-80} --ws none"]

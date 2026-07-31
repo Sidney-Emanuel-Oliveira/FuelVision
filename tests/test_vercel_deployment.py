@@ -76,7 +76,16 @@ class VercelDeploymentContractTest(unittest.TestCase):
         self.assertIn('VERCEL_ENV:-}" = "development"', entrypoint)
         self.assertIn("http://127[.]0[.]0[.]1:", entrypoint)
         self.assertIn("http://host.docker.internal:", entrypoint)
-        self.assertIn("exec java", entrypoint)
+        self.assertIn('java_bin="/opt/java/openjdk/bin/java"', entrypoint)
+        self.assertIn('exec "$java_bin"', entrypoint)
+
+    def test_container_commands_do_not_depend_on_runtime_path(self) -> None:
+        prediction_dockerfile = (PROJECT_ROOT / "Dockerfile.vercel").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("/opt/venv/bin/python -m uvicorn", prediction_dockerfile)
+        self.assertIn("/opt/venv/bin/python -c", prediction_dockerfile)
 
 
 if __name__ == "__main__":
